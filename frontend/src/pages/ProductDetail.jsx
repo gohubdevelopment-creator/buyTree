@@ -73,13 +73,20 @@ export default function ProductDetail() {
     }
   };
 
-  const handleBuyNow = () => {
+  const handleBuyNow = async () => {
     if (!user) {
       navigate('/login');
       return;
     }
-    // TODO: Implement direct checkout
-    alert('Buy now - going to checkout!');
+
+    // Add item to cart first
+    const result = await addToCartContext(product.id, quantity);
+    if (result.success) {
+      // Navigate to checkout page
+      navigate('/checkout');
+    } else {
+      alert(result.error || 'Failed to add to cart');
+    }
   };
 
   const handleShare = (platform) => {

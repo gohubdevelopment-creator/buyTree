@@ -8,14 +8,28 @@ export default function Checkout() {
   const navigate = useNavigate();
   const location = useLocation();
   const { user } = useAuth();
-  const { cartItems, getCartTotal, clearCart } = useCart();
+  const { cartItems, getCartTotal, clearCart, syncPendingUpdates } = useCart();
   const [loading, setLoading] = useState(false);
-  const [deliveryDetails, setDeliveryDetails] = useState({
-    name: '',
-    phone: '',
-    address: '',
-    notes: '',
-  });
+
+  // Load saved delivery details from localStorage
+  const loadSavedDeliveryDetails = () => {
+    try {
+      const saved = localStorage.getItem('buytree_delivery_details');
+      if (saved) {
+        return JSON.parse(saved);
+      }
+    } catch (error) {
+      console.error('Failed to load delivery details:', error);
+    }
+    return {
+      name: '',
+      phone: '',
+      address: '',
+      notes: '',
+    };
+  };
+
+  const [deliveryDetails, setDeliveryDetails] = useState(loadSavedDeliveryDetails());
 
   // Get sellerId from location state (for individual checkout)
   const selectedSellerId = location.state?.sellerId;
@@ -24,6 +38,14 @@ export default function Checkout() {
   const checkoutItems = selectedSellerId
     ? cartItems.filter(item => item.seller_id === selectedSellerId)
     : cartItems;
+
+  useEffect(() => {
+    // Sync any pending cart updates when entering checkout
+    const syncCart = async () => {
+      await syncPendingUpdates();
+    };
+    syncCart();
+  }, [syncPendingUpdates]);
 
   useEffect(() => {
     // Redirect if cart is empty
@@ -49,10 +71,24 @@ export default function Checkout() {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setDeliveryDetails((prev) => ({
-      ...prev,
+    const updated = {
+      ...deliveryDetails,
       [name]: value,
-    }));
+    };
+    setDeliveryDetails(updated);
+
+    // Save to localStorage (excluding notes for privacy)
+    try {
+      const toSave = {
+        name: updated.name,
+        phone: updated.phone,
+        address: updated.address,
+        notes: '', // Don't persist notes
+      };
+      localStorage.setItem('buytree_delivery_details', JSON.stringify(toSave));
+    } catch (error) {
+      console.error('Failed to save delivery details:', error);
+    }
   };
 
   const validateForm = () => {

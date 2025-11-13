@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { productService } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
+import { searchCache } from '../utils/cache';
 
 const CATEGORIES = [
   'All',
@@ -50,7 +51,6 @@ export default function SearchResults() {
   }, [query, selectedCategory, minPrice, maxPrice, sortBy]);
 
   const fetchSearchResults = async () => {
-    setLoading(true);
     setError('');
 
     try {
@@ -69,13 +69,47 @@ export default function SearchResults() {
         params.sort = sortBy;
       }
 
-      const response = await productService.searchProducts(params);
-      setProducts(response.data.products || []);
+      // Create cache key from search params
+      const cacheKey = `search_${JSON.stringify(params)}`;
+
+      // Try to load from cache first
+      const cachedResults = searchCache.get(cacheKey);
+      if (cachedResults) {
+        // Load from cache instantly
+        setProducts(cachedResults);
+        setLoading(false);
+
+        // Fetch fresh data in background to keep cache warm
+        fetchSearchResultsFromServer(params, cacheKey, true);
+        return;
+      }
+
+      // No cache - show loading and fetch
+      setLoading(true);
+      await fetchSearchResultsFromServer(params, cacheKey, false);
     } catch (err) {
       setError('Failed to search products');
       console.error('Search error:', err);
-    } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchSearchResultsFromServer = async (params, cacheKey, isBackgroundRefresh) => {
+    try {
+      const response = await productService.searchProducts(params);
+      const results = response.data.products || [];
+
+      // Cache search results (5 minutes TTL)
+      searchCache.set(cacheKey, results, 5 * 60 * 1000);
+
+      if (!isBackgroundRefresh) {
+        setProducts(results);
+        setLoading(false);
+      }
+    } catch (err) {
+      if (!isBackgroundRefresh) {
+        throw err;
+      }
     }
   };
 

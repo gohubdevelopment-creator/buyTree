@@ -3,6 +3,7 @@ import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { productService, sellerService } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
+import { productCache, shopCache } from '../utils/cache';
 
 const CATEGORIES = [
   'All',
@@ -39,18 +40,11 @@ export default function Shop() {
     fetchShopData();
   }, [shopSlug, selectedCategory, searchQuery, minPrice, maxPrice]);
 
-  const fetchShopData = async () => {
-    setLoading(true);
+  const fetchShopData = async (forceRefresh = false) => {
     setError('');
 
     try {
-      // Fetch shop info
-      console.log('Fetching shop:', shopSlug);
-      const shopResponse = await sellerService.getSellerBySlug(shopSlug);
-      console.log('Shop response:', shopResponse);
-      setShop(shopResponse.data.seller);
-
-      // Fetch shop products
+      // Build filter object
       const filters = {};
       if (selectedCategory && selectedCategory !== 'All') {
         filters.category = selectedCategory;
@@ -65,24 +59,85 @@ export default function Shop() {
         filters.maxPrice = maxPrice;
       }
 
+      // Create cache keys
+      const shopCacheKey = `shop_${shopSlug}`;
+      const productsCacheKey = `products_${shopSlug}_${JSON.stringify(filters)}`;
+
+      // Try to load from cache first (if not forcing refresh)
+      if (!forceRefresh) {
+        const cachedShop = shopCache.get(shopCacheKey);
+        const cachedProducts = productCache.get(productsCacheKey);
+
+        if (cachedShop && cachedProducts) {
+          // Load from cache instantly
+          setShop(cachedShop);
+          setProducts(cachedProducts);
+          setLoading(false);
+
+          // Update URL params
+          const params = {};
+          if (selectedCategory !== 'All') params.category = selectedCategory;
+          if (searchQuery) params.search = searchQuery;
+          if (minPrice) params.minPrice = minPrice;
+          if (maxPrice) params.maxPrice = maxPrice;
+          setSearchParams(params);
+
+          // Fetch fresh data in background to keep cache warm
+          fetchShopDataFromServer(shopCacheKey, productsCacheKey, filters, true);
+          return;
+        }
+      }
+
+      // No cache or force refresh - show loading
+      setLoading(true);
+      await fetchShopDataFromServer(shopCacheKey, productsCacheKey, filters, false);
+    } catch (err) {
+      console.error('Error fetching shop data:', err);
+      setError(err.response?.data?.message || err.message || 'Failed to load shop');
+      setLoading(false);
+    }
+  };
+
+  const fetchShopDataFromServer = async (shopCacheKey, productsCacheKey, filters, isBackgroundRefresh) => {
+    try {
+      // Fetch shop info
+      console.log('Fetching shop:', shopSlug);
+      const shopResponse = await sellerService.getSellerBySlug(shopSlug);
+      console.log('Shop response:', shopResponse);
+      const shopData = shopResponse.data.seller;
+
+      // Cache shop data (30 minutes TTL)
+      shopCache.set(shopCacheKey, shopData, 30 * 60 * 1000);
+      if (!isBackgroundRefresh) {
+        setShop(shopData);
+      }
+
+      // Fetch shop products
       console.log('Fetching products for shop:', shopSlug, 'with filters:', filters);
       const productsResponse = await productService.getProductsByShopSlug(shopSlug, filters);
       console.log('Products response:', productsResponse);
-      setProducts(productsResponse.data.products);
+      const productsData = productsResponse.data.products;
 
-      // Update URL params
-      const params = {};
-      if (selectedCategory !== 'All') params.category = selectedCategory;
-      if (searchQuery) params.search = searchQuery;
-      if (minPrice) params.minPrice = minPrice;
-      if (maxPrice) params.maxPrice = maxPrice;
-      setSearchParams(params);
+      // Cache products (10 minutes TTL)
+      productCache.set(productsCacheKey, productsData, 10 * 60 * 1000);
+      if (!isBackgroundRefresh) {
+        setProducts(productsData);
+
+        // Update URL params
+        const params = {};
+        if (selectedCategory !== 'All') params.category = selectedCategory;
+        if (searchQuery) params.search = searchQuery;
+        if (minPrice) params.minPrice = minPrice;
+        if (maxPrice) params.maxPrice = maxPrice;
+        setSearchParams(params);
+
+        setLoading(false);
+      }
     } catch (err) {
-      console.error('Error fetching shop data:', err);
-      console.error('Error response:', err.response);
-      setError(err.response?.data?.message || err.message || 'Failed to load shop');
-    } finally {
-      setLoading(false);
+      if (!isBackgroundRefresh) {
+        console.error('Error fetching shop data from server:', err);
+        throw err;
+      }
     }
   };
 
