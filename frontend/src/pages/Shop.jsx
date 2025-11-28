@@ -194,10 +194,10 @@ export default function Shop() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
             <div className="flex items-center gap-4">
-              {/* BuyTree Logo - Links to landing page */}
-              <button onClick={() => navigate('/')} className="text-2xl font-bold text-green-600 hover:text-green-700 transition-colors">
+              {/* BuyTree Logo - No navigation, just branding */}
+              <div className="text-2xl font-bold text-green-600">
                 BuyTree
-              </button>
+              </div>
               {/* Powered by badge for sellers to see */}
               <span className="hidden md:inline text-xs text-gray-500 px-2 py-1 bg-gray-100 rounded-full">
                 Powered Store
