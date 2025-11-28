@@ -59,9 +59,24 @@ export default function Signup() {
     const result = await signup(signupData);
 
     if (result.success) {
-      // Redirect to the page user was on before signup, or home
-      const redirectTo = searchParams.get('redirect') || '/';
-      navigate(redirectTo);
+      // Get redirect parameter or determine default based on user role
+      const redirectParam = searchParams.get('redirect');
+
+      // Wait a bit for user data to be available
+      setTimeout(() => {
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+
+        if (redirectParam) {
+          // Use redirect parameter if provided
+          navigate(redirectParam);
+        } else if (user.role === 'seller') {
+          // Sellers go to dashboard
+          navigate('/seller/dashboard');
+        } else {
+          // Buyers have no default page, stay on current page or go to orders
+          navigate('/orders');
+        }
+      }, 100);
     } else {
       setError(result.message);
     }
