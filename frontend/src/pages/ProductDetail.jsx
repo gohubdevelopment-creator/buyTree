@@ -93,13 +93,16 @@ export default function ProductDetail() {
   };
 
   const handleAddToCart = async () => {
-    if (!user) {
-      // Redirect to login if not authenticated
-      navigate('/login');
-      return;
-    }
+    // Prepare product data for guest cart
+    const productData = {
+      product_name: product.name,
+      price: product.price,
+      product_image_url: product.image_url,
+      product_slug: product.slug,
+      shop_slug: shopSlug,
+    };
 
-    const result = await addToCartContext(product.id, quantity);
+    const result = await addToCartContext(product.id, quantity, productData);
     if (result.success) {
       alert(`Added ${quantity} × ${product.name} to cart!`);
     } else {
@@ -109,12 +112,22 @@ export default function ProductDetail() {
 
   const handleBuyNow = async () => {
     if (!user) {
-      navigate('/login');
+      // For guest users, redirect to login with cart redirect
+      navigate(`/login?redirect=/checkout`);
       return;
     }
 
+    // Prepare product data for guest cart
+    const productData = {
+      product_name: product.name,
+      price: product.price,
+      product_image_url: product.image_url,
+      product_slug: product.slug,
+      shop_slug: shopSlug,
+    };
+
     // Add item to cart first
-    const result = await addToCartContext(product.id, quantity);
+    const result = await addToCartContext(product.id, quantity, productData);
     if (result.success) {
       // Navigate to checkout page
       navigate('/checkout');

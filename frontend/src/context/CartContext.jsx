@@ -16,6 +16,7 @@ export function CartProvider({ children }) {
   const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [itemCount, setItemCount] = useState(0);
+  const [isGuest, setIsGuest] = useState(true);
 
   // Track pending updates for debouncing
   const pendingUpdates = useRef({});
@@ -25,14 +26,56 @@ export function CartProvider({ children }) {
   // LocalStorage keys
   const CART_STORAGE_KEY = 'buytree_cart_items';
   const CART_TIMESTAMP_KEY = 'buytree_cart_timestamp';
+  const GUEST_CART_KEY = 'buytree_guest_cart';
+
+  // Load guest cart from localStorage
+  const loadGuestCart = () => {
+    try {
+      const savedCart = localStorage.getItem(GUEST_CART_KEY);
+      return savedCart ? JSON.parse(savedCart) : [];
+    } catch (error) {
+      console.error('Failed to load guest cart:', error);
+      return [];
+    }
+  };
+
+  // Save guest cart to localStorage
+  const saveGuestCart = (items) => {
+    try {
+      localStorage.setItem(GUEST_CART_KEY, JSON.stringify(items));
+    } catch (error) {
+      console.error('Failed to save guest cart:', error);
+    }
+  };
+
+  // Transfer guest cart to user cart after login
+  const transferGuestCartToUser = async () => {
+    const guestCart = loadGuestCart();
+    if (guestCart.length === 0) return;
+
+    try {
+      // Add all guest cart items to user cart
+      for (const item of guestCart) {
+        await cartService.addToCart(item.product_id, item.quantity);
+      }
+      // Clear guest cart
+      localStorage.removeItem(GUEST_CART_KEY);
+      // Refresh user cart
+      await fetchCart();
+    } catch (error) {
+      console.error('Failed to transfer guest cart:', error);
+    }
+  };
 
   // Load cart from localStorage or server on mount
   useEffect(() => {
     initializeCart();
 
-    // Set up periodic sync every 5 minutes
+    // Set up periodic sync every 5 minutes (only for logged in users)
     periodicSyncTimer.current = setInterval(() => {
-      syncPendingUpdates();
+      if (!isGuest) {
+        syncPendingUpdates();
+      }
     }, 5 * 60 * 1000);
 
     // Set up beforeunload listener to sync on tab close
@@ -60,8 +103,12 @@ export function CartProvider({ children }) {
     setItemCount(count);
 
     // Save to localStorage whenever cart changes
-    saveCartToLocalStorage(cartItems);
-  }, [cartItems]);
+    if (isGuest) {
+      saveGuestCart(cartItems);
+    } else {
+      saveCartToLocalStorage(cartItems);
+    }
+  }, [cartItems, isGuest]);
 
   // Save cart to localStorage
   const saveCartToLocalStorage = (items) => {
@@ -100,7 +147,21 @@ export function CartProvider({ children }) {
     const token = localStorage.getItem('token');
 
     if (!token) {
+      // Guest user - load from guest cart
+      setIsGuest(true);
+      const guestCart = loadGuestCart();
+      setCartItems(guestCart);
       setLoading(false);
+      return;
+    }
+
+    // Logged in user
+    setIsGuest(false);
+
+    // Check if there's a guest cart to transfer
+    const guestCart = loadGuestCart();
+    if (guestCart.length > 0) {
+      await transferGuestCartToUser();
       return;
     }
 
@@ -159,11 +220,32 @@ export function CartProvider({ children }) {
     }
   };
 
-  const addToCart = async (productId, quantity = 1) => {
+  const addToCart = async (productId, quantity = 1, productData = null) => {
     try {
-      await cartService.addToCart(productId, quantity);
-      await fetchCart(); // Refresh cart
-      return { success: true };
+      if (isGuest) {
+        // Guest cart - add to localStorage
+        const currentCart = loadGuestCart();
+        const existingItem = currentCart.find(item => item.product_id === productId);
+
+        if (existingItem) {
+          existingItem.quantity += quantity;
+        } else {
+          currentCart.push({
+            product_id: productId,
+            quantity,
+            ...productData, // Include product details for display
+          });
+        }
+
+        setCartItems(currentCart);
+        saveGuestCart(currentCart);
+        return { success: true };
+      } else {
+        // Logged in user - add to server
+        await cartService.addToCart(productId, quantity);
+        await fetchCart(); // Refresh cart
+        return { success: true };
+      }
     } catch (error) {
       console.error('Failed to add to cart:', error);
       return { success: false, error: error.response?.data?.message || 'Failed to add to cart' };
@@ -194,6 +276,12 @@ export function CartProvider({ children }) {
       )
     );
 
+    if (isGuest) {
+      // Guest cart - just update localStorage
+      return { success: true };
+    }
+
+    // Logged in user - debounce server update
     // Store pending update
     pendingUpdates.current[productId] = quantity;
 
@@ -217,6 +305,12 @@ export function CartProvider({ children }) {
     setCartItems(prevItems => prevItems.filter(item => item.product_id !== productId));
 
     try {
+      if (isGuest) {
+        // Guest cart - just update localStorage
+        return { success: true };
+      }
+
+      // Logged in user - remove from server
       // Clear any pending update timer
       if (updateTimers.current[productId]) {
         clearTimeout(updateTimers.current[productId]);
@@ -243,13 +337,19 @@ export function CartProvider({ children }) {
       updateTimers.current = {};
       pendingUpdates.current = {};
 
-      await cartService.clearCart();
+      if (isGuest) {
+        // Guest cart - clear localStorage
+        localStorage.removeItem(GUEST_CART_KEY);
+      } else {
+        // Logged in user - clear server cart
+        await cartService.clearCart();
+        // Explicitly clear localStorage
+        localStorage.removeItem(CART_STORAGE_KEY);
+        localStorage.removeItem(CART_TIMESTAMP_KEY);
+      }
+
       setCartItems([]);
       setCart(null);
-
-      // Explicitly clear localStorage
-      localStorage.removeItem(CART_STORAGE_KEY);
-      localStorage.removeItem(CART_TIMESTAMP_KEY);
 
       return { success: true };
     } catch (error) {
@@ -264,6 +364,8 @@ export function CartProvider({ children }) {
 
   // Synchronous sync for beforeunload (uses sendBeacon or synchronous XHR as fallback)
   const syncPendingUpdatesBeforeUnload = () => {
+    if (isGuest) return;
+
     const token = localStorage.getItem('token');
     if (!token) return;
 
@@ -281,6 +383,8 @@ export function CartProvider({ children }) {
 
   // Sync all pending updates before checkout
   const syncPendingUpdates = async () => {
+    if (isGuest) return;
+
     const promises = Object.entries(pendingUpdates.current).map(([productId, quantity]) => {
       // Clear timer and sync immediately
       if (updateTimers.current[productId]) {
@@ -299,6 +403,7 @@ export function CartProvider({ children }) {
     cartItems,
     loading,
     itemCount,
+    isGuest,
     addToCart,
     updateQuantity,
     removeFromCart,
@@ -306,6 +411,7 @@ export function CartProvider({ children }) {
     getCartTotal,
     refreshCart: fetchCart,
     syncPendingUpdates,
+    transferGuestCartToUser,
   };
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
