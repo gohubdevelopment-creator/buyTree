@@ -25,7 +25,7 @@ export default function AdminAnalytics() {
       setLoading(true);
       const token = localStorage.getItem('token');
       const response = await axios.get(
-        `${import.meta.env.VITE_API_URL}/api/admin/analytics/revenue?period=${period}`,
+        `${import.meta.env.VITE_API_URL}/admin/analytics/revenue?period=${period}`,
         {
           headers: { Authorization: `Bearer ${token}` }
         }

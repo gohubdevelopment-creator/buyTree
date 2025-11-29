@@ -1,4 +1,8 @@
+import { useNavigate } from 'react-router-dom';
+
 export default function ComingSoon() {
+  const navigate = useNavigate();
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-white flex items-center justify-center px-4">
       <div className="max-w-2xl w-full text-center">
@@ -14,6 +18,22 @@ export default function ComingSoon() {
         <p className="text-lg text-gray-600 mb-8">
           BuyTree is building the future of campus commerce. Stay tuned for updates.
         </p>
+
+        {/* Login and Signup Buttons */}
+        <div className="flex justify-center items-center space-x-4 mb-12">
+          <button
+            onClick={() => navigate('/login')}
+            className="px-8 py-3 bg-white border-2 border-green-600 text-green-600 rounded-lg font-semibold hover:bg-green-50 transition-colors"
+          >
+            Login
+          </button>
+          <button
+            onClick={() => navigate('/signup')}
+            className="px-8 py-3 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition-colors"
+          >
+            Sign Up
+          </button>
+        </div>
 
         <div className="flex justify-center items-center space-x-4 mt-12">
           <div className="w-3 h-3 bg-green-600 rounded-full animate-bounce"></div>

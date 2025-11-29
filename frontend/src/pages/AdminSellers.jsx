@@ -42,7 +42,7 @@ export default function AdminSellers() {
       });
 
       const response = await axios.get(
-        `${import.meta.env.VITE_API_URL}/api/admin/sellers?${params}`,
+        `${import.meta.env.VITE_API_URL}/admin/sellers?${params}`,
         {
           headers: { Authorization: `Bearer ${token}` }
         }
@@ -65,7 +65,7 @@ export default function AdminSellers() {
       setActionLoading(true);
       const token = localStorage.getItem('token');
       const response = await axios.put(
-        `${import.meta.env.VITE_API_URL}/api/admin/sellers/${sellerId}/approve`,
+        `${import.meta.env.VITE_API_URL}/admin/sellers/${sellerId}/approve`,
         { notes: actionNotes },
         {
           headers: { Authorization: `Bearer ${token}` }
@@ -96,7 +96,7 @@ export default function AdminSellers() {
       setActionLoading(true);
       const token = localStorage.getItem('token');
       const response = await axios.put(
-        `${import.meta.env.VITE_API_URL}/api/admin/sellers/${sellerId}/suspend`,
+        `${import.meta.env.VITE_API_URL}/admin/sellers/${sellerId}/suspend`,
         { reason: actionNotes },
         {
           headers: { Authorization: `Bearer ${token}` }

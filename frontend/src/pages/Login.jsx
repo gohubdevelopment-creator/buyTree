@@ -40,6 +40,9 @@ export default function Login() {
         if (redirectParam) {
           // Use redirect parameter if provided
           navigate(redirectParam);
+        } else if (user.role === 'admin') {
+          // Admins go to admin dashboard
+          navigate('/admin/dashboard');
         } else if (user.role === 'seller') {
           // Sellers go to dashboard
           navigate('/seller/dashboard');
