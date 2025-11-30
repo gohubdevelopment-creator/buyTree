@@ -24,15 +24,24 @@ export default function AdminAnalytics() {
     try {
       setLoading(true);
       const token = localStorage.getItem('token');
-      const response = await axios.get(
-        `${import.meta.env.VITE_API_URL}/admin/analytics/revenue?period=${period}`,
-        {
-          headers: { Authorization: `Bearer ${token}` }
-        }
-      );
 
-      if (response.data.success) {
-        setAnalytics(response.data.data);
+      // Fetch both revenue analytics and top products in parallel
+      const [revenueResponse, topProductsResponse] = await Promise.all([
+        axios.get(
+          `${import.meta.env.VITE_API_URL}/admin/analytics/revenue?period=${period}`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        ),
+        axios.get(
+          `${import.meta.env.VITE_API_URL}/admin/analytics/top-products?period=${period}`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        )
+      ]);
+
+      if (revenueResponse.data.success && topProductsResponse.data.success) {
+        setAnalytics({
+          ...revenueResponse.data.data,
+          topProducts: topProductsResponse.data.data.topProducts
+        });
       }
     } catch (err) {
       console.error('Error fetching analytics:', err);
@@ -296,6 +305,76 @@ export default function AdminAnalytics() {
                       <tr>
                         <td colSpan="4" className="py-8 text-center text-gray-500">
                           No category data for this period
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* Top Performing Products */}
+            <div className="bg-white rounded-lg shadow p-6 mt-8">
+              <h2 className="text-lg font-semibold text-gray-900 mb-6">Top Performing Products</h2>
+              <div className="overflow-x-auto">
+                <table className="min-w-full">
+                  <thead>
+                    <tr className="border-b border-gray-200">
+                      <th className="text-left py-3 px-4 text-sm font-medium text-gray-600">Rank</th>
+                      <th className="text-left py-3 px-4 text-sm font-medium text-gray-600">Product</th>
+                      <th className="text-left py-3 px-4 text-sm font-medium text-gray-600">Seller</th>
+                      <th className="text-right py-3 px-4 text-sm font-medium text-gray-600">Units Sold</th>
+                      <th className="text-right py-3 px-4 text-sm font-medium text-gray-600">Revenue</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-200">
+                    {analytics?.topProducts?.length > 0 ? (
+                      analytics.topProducts.map((product, index) => (
+                        <tr key={product.id} className="hover:bg-gray-50">
+                          <td className="py-3 px-4 text-sm text-gray-900">
+                            <span className={`inline-flex items-center justify-center w-8 h-8 rounded-full ${
+                              index === 0 ? 'bg-yellow-100 text-yellow-800' :
+                              index === 1 ? 'bg-gray-200 text-gray-700' :
+                              index === 2 ? 'bg-orange-100 text-orange-800' :
+                              'bg-gray-100 text-gray-600'
+                            }`}>
+                              #{index + 1}
+                            </span>
+                          </td>
+                          <td className="py-3 px-4">
+                            <div className="flex items-center space-x-3">
+                              {product.image_urls && product.image_urls.length > 0 ? (
+                                <img
+                                  src={product.image_urls[0]}
+                                  alt={product.name}
+                                  className="w-12 h-12 rounded object-cover"
+                                />
+                              ) : (
+                                <div className="w-12 h-12 bg-gray-200 rounded flex items-center justify-center">
+                                  <span className="text-gray-400 text-xs">No image</span>
+                                </div>
+                              )}
+                              <div>
+                                <div className="text-sm font-medium text-gray-900">{product.name}</div>
+                              </div>
+                            </div>
+                          </td>
+                          <td className="py-3 px-4">
+                            <div className="text-sm font-medium text-gray-900">{product.shop_name}</div>
+                            <div className="text-sm text-gray-500">/{product.shop_slug}</div>
+                          </td>
+                          <td className="py-3 px-4 text-sm text-right text-gray-900">
+                            {product.units_sold}
+                          </td>
+                          <td className="py-3 px-4 text-sm text-right font-semibold text-gray-900">
+                            {formatPrice(product.total_revenue)}
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan="5" className="py-8 text-center text-gray-500">
+                          No product data for this period
                         </td>
                       </tr>
                     )}

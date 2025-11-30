@@ -9,6 +9,7 @@ const {
   suspendSeller,
   getAllOrders,
   getRevenueAnalytics,
+  getTopProducts,
 } = require('../controllers/adminController');
 
 // All admin routes require authentication AND admin role
@@ -28,5 +29,6 @@ router.get('/orders', getAllOrders);
 
 // Analytics
 router.get('/analytics/revenue', getRevenueAnalytics);
+router.get('/analytics/top-products', getTopProducts);
 
 module.exports = router;

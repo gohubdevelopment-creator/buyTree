@@ -416,6 +416,52 @@ const getRevenueAnalytics = async (req, res) => {
   }
 };
 
+// Get top performing products across all sellers
+const getTopProducts = async (req, res) => {
+  try {
+    const { period = '30days' } = req.query;
+
+    let interval = '30 days';
+    if (period === '7days') interval = '7 days';
+    if (period === '90days') interval = '90 days';
+    if (period === '1year') interval = '1 year';
+
+    // Top products by revenue
+    const topProductsResult = await db.query(`
+      SELECT
+        p.id,
+        p.name,
+        p.image_urls,
+        s.shop_name,
+        s.shop_slug,
+        SUM(oi.quantity) as units_sold,
+        SUM(oi.subtotal) as total_revenue
+      FROM order_items oi
+      JOIN products p ON oi.product_id = p.id
+      JOIN sellers s ON p.seller_id = s.id
+      JOIN orders o ON oi.order_id = o.id
+      WHERE o.payment_status = 'paid'
+        AND o.created_at >= CURRENT_DATE - INTERVAL '${interval}'
+      GROUP BY p.id, p.name, p.image_urls, s.shop_name, s.shop_slug
+      ORDER BY total_revenue DESC
+      LIMIT 10
+    `);
+
+    return res.status(200).json({
+      success: true,
+      data: {
+        topProducts: topProductsResult.rows,
+      },
+    });
+  } catch (error) {
+    logger.error('Error fetching top products', error, { period: req.query.period });
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to fetch top products',
+    });
+  }
+};
+
 module.exports = {
   requireAdmin,
   getDashboardMetrics,
@@ -424,4 +470,5 @@ module.exports = {
   suspendSeller,
   getAllOrders,
   getRevenueAnalytics,
+  getTopProducts,
 };
