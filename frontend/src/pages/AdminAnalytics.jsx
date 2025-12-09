@@ -79,39 +79,39 @@ export default function AdminAnalytics() {
   const totals = analytics ? calculateTotals(analytics.dailyRevenue) : { revenue: 0, commission: 0, orders: 0 };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="page-container">
       {/* Header */}
-      <div className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
+      <div className="nav-header">
+        <div className="nav-content">
+          <div className="flex-between">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Revenue Analytics</h1>
-              <p className="text-sm text-gray-600 mt-1">
+              <h1 className="heading-xl">Revenue Analytics</h1>
+              <p className="text-muted">
                 Platform revenue and performance insights
               </p>
             </div>
-            <div className="flex items-center space-x-4">
+            <div className="nav-links">
               <button
                 onClick={() => navigate('/admin/dashboard')}
-                className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg"
+                className="btn-secondary"
               >
                 Dashboard
               </button>
               <button
                 onClick={() => navigate('/admin/sellers')}
-                className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg"
+                className="btn-secondary"
               >
                 Sellers
               </button>
               <button
                 onClick={() => navigate('/admin/orders')}
-                className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg"
+                className="btn-secondary"
               >
                 Orders
               </button>
               <button
                 onClick={logout}
-                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+                className="btn-danger"
               >
                 Logout
               </button>
@@ -121,16 +121,16 @@ export default function AdminAnalytics() {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="content-wrapper">
         {/* Period Selector */}
-        <div className="bg-white rounded-lg shadow p-6 mb-6">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+        <div className="card mb-6">
+          <label className="form-label">
             Time Period
           </label>
           <select
             value={period}
             onChange={(e) => setPeriod(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+            className="form-select"
           >
             <option value="7days">Last 7 Days</option>
             <option value="30days">Last 30 Days</option>
@@ -140,69 +140,69 @@ export default function AdminAnalytics() {
         </div>
 
         {loading ? (
-          <div className="bg-white rounded-lg shadow p-8 text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto"></div>
-            <p className="mt-4 text-gray-600">Loading analytics...</p>
+          <div className="card text-center">
+            <div className="loading-spinner-lg"></div>
+            <p className="loading-text">Loading analytics...</p>
           </div>
         ) : error ? (
-          <div className="bg-white rounded-lg shadow p-8 text-center">
-            <p className="text-red-600">{error}</p>
+          <div className="card text-center">
+            <p className="error-text">{error}</p>
           </div>
         ) : (
           <>
             {/* Summary Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-              <div className="bg-white rounded-lg shadow p-6">
-                <p className="text-sm text-gray-600 mb-2">Total Revenue</p>
-                <p className="text-3xl font-bold text-gray-900">{formatPrice(totals.revenue)}</p>
-                <p className="text-xs text-gray-500 mt-2">{totals.orders} orders</p>
+            <div className="stats-grid">
+              <div className="stat-card">
+                <p className="stat-label">Total Revenue</p>
+                <p className="stat-value">{formatPrice(totals.revenue)}</p>
+                <p className="stat-description">{totals.orders} orders</p>
               </div>
-              <div className="bg-white rounded-lg shadow p-6">
-                <p className="text-sm text-gray-600 mb-2">Platform Commission</p>
-                <p className="text-3xl font-bold text-green-600">{formatPrice(totals.commission)}</p>
-                <p className="text-xs text-gray-500 mt-2">
+              <div className="stat-card">
+                <p className="stat-label">Platform Commission</p>
+                <p className="stat-value-green">{formatPrice(totals.commission)}</p>
+                <p className="stat-description">
                   {((totals.commission / totals.revenue) * 100 || 0).toFixed(1)}% of revenue
                 </p>
               </div>
-              <div className="bg-white rounded-lg shadow p-6">
-                <p className="text-sm text-gray-600 mb-2">Average Order Value</p>
-                <p className="text-3xl font-bold text-gray-900">
+              <div className="stat-card">
+                <p className="stat-label">Average Order Value</p>
+                <p className="stat-value">
                   {formatPrice(totals.orders > 0 ? totals.revenue / totals.orders : 0)}
                 </p>
-                <p className="text-xs text-gray-500 mt-2">Across {totals.orders} orders</p>
+                <p className="stat-description">Across {totals.orders} orders</p>
               </div>
             </div>
 
             {/* Daily Revenue Chart */}
-            <div className="bg-white rounded-lg shadow p-6 mb-8">
-              <h2 className="text-lg font-semibold text-gray-900 mb-6">Daily Revenue Trend</h2>
-              <div className="overflow-x-auto">
-                <table className="min-w-full">
+            <div className="card-section">
+              <h2 className="section-header-mb-6">Daily Revenue Trend</h2>
+              <div className="table-container">
+                <table className="table">
                   <thead>
-                    <tr className="border-b border-gray-200">
-                      <th className="text-left py-3 px-4 text-sm font-medium text-gray-600">Date</th>
-                      <th className="text-right py-3 px-4 text-sm font-medium text-gray-600">Orders</th>
-                      <th className="text-right py-3 px-4 text-sm font-medium text-gray-600">Revenue</th>
-                      <th className="text-right py-3 px-4 text-sm font-medium text-gray-600">Commission</th>
+                    <tr className="table-header-row">
+                      <th className="table-header-cell">Date</th>
+                      <th className="table-header-cell-right">Orders</th>
+                      <th className="table-header-cell-right">Revenue</th>
+                      <th className="table-header-cell-right">Commission</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-gray-200">
+                  <tbody className="table-body">
                     {analytics?.dailyRevenue?.length > 0 ? (
                       analytics.dailyRevenue.map((day, index) => (
-                        <tr key={index} className="hover:bg-gray-50">
-                          <td className="py-3 px-4 text-sm text-gray-900">{formatDate(day.date)}</td>
-                          <td className="py-3 px-4 text-sm text-right text-gray-900">{day.order_count}</td>
-                          <td className="py-3 px-4 text-sm text-right font-semibold text-gray-900">
+                        <tr key={index} className="table-row">
+                          <td className="table-cell">{formatDate(day.date)}</td>
+                          <td className="table-cell-right">{day.order_count}</td>
+                          <td className="table-cell-right-bold">
                             {formatPrice(day.revenue)}
                           </td>
-                          <td className="py-3 px-4 text-sm text-right font-semibold text-green-600">
+                          <td className="table-cell-right-green">
                             {formatPrice(day.commission)}
                           </td>
                         </tr>
                       ))
                     ) : (
                       <tr>
-                        <td colSpan="4" className="py-8 text-center text-gray-500">
+                        <td colSpan="4" className="empty-state">
                           No revenue data for this period
                         </td>
                       </tr>
@@ -213,51 +213,51 @@ export default function AdminAnalytics() {
             </div>
 
             {/* Top Sellers */}
-            <div className="bg-white rounded-lg shadow p-6 mb-8">
-              <h2 className="text-lg font-semibold text-gray-900 mb-6">Top Performing Sellers</h2>
-              <div className="overflow-x-auto">
-                <table className="min-w-full">
+            <div className="card-section">
+              <h2 className="section-header-mb-6">Top Performing Sellers</h2>
+              <div className="table-container">
+                <table className="table">
                   <thead>
-                    <tr className="border-b border-gray-200">
-                      <th className="text-left py-3 px-4 text-sm font-medium text-gray-600">Rank</th>
-                      <th className="text-left py-3 px-4 text-sm font-medium text-gray-600">Shop</th>
-                      <th className="text-right py-3 px-4 text-sm font-medium text-gray-600">Orders</th>
-                      <th className="text-right py-3 px-4 text-sm font-medium text-gray-600">Revenue</th>
-                      <th className="text-right py-3 px-4 text-sm font-medium text-gray-600">Commission</th>
+                    <tr className="table-header-row">
+                      <th className="table-header-cell">Rank</th>
+                      <th className="table-header-cell">Shop</th>
+                      <th className="table-header-cell-right">Orders</th>
+                      <th className="table-header-cell-right">Revenue</th>
+                      <th className="table-header-cell-right">Commission</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-gray-200">
+                  <tbody className="table-body">
                     {analytics?.topSellers?.length > 0 ? (
                       analytics.topSellers.map((seller, index) => (
-                        <tr key={seller.id} className="hover:bg-gray-50">
-                          <td className="py-3 px-4 text-sm text-gray-900">
-                            <span className={`inline-flex items-center justify-center w-8 h-8 rounded-full ${
-                              index === 0 ? 'bg-yellow-100 text-yellow-800' :
-                              index === 1 ? 'bg-gray-200 text-gray-700' :
-                              index === 2 ? 'bg-orange-100 text-orange-800' :
-                              'bg-gray-100 text-gray-600'
-                            }`}>
+                        <tr key={seller.id} className="table-row">
+                          <td className="table-cell">
+                            <span className={
+                              index === 0 ? 'rank-badge-gold' :
+                              index === 1 ? 'rank-badge-silver' :
+                              index === 2 ? 'rank-badge-bronze' :
+                              'rank-badge'
+                            }>
                               #{index + 1}
                             </span>
                           </td>
-                          <td className="py-3 px-4">
-                            <div className="text-sm font-medium text-gray-900">{seller.shop_name}</div>
-                            <div className="text-sm text-gray-500">/{seller.shop_slug}</div>
+                          <td className="table-cell">
+                            <div className="table-primary-text">{seller.shop_name}</div>
+                            <div className="table-secondary-text">/{seller.shop_slug}</div>
                           </td>
-                          <td className="py-3 px-4 text-sm text-right text-gray-900">
+                          <td className="table-cell-right">
                             {seller.total_orders}
                           </td>
-                          <td className="py-3 px-4 text-sm text-right font-semibold text-gray-900">
+                          <td className="table-cell-right-bold">
                             {formatPrice(seller.total_revenue)}
                           </td>
-                          <td className="py-3 px-4 text-sm text-right font-semibold text-green-600">
+                          <td className="table-cell-right-green">
                             {formatPrice(seller.total_commission)}
                           </td>
                         </tr>
                       ))
                     ) : (
                       <tr>
-                        <td colSpan="5" className="py-8 text-center text-gray-500">
+                        <td colSpan="5" className="empty-state">
                           No seller data for this period
                         </td>
                       </tr>
@@ -268,34 +268,34 @@ export default function AdminAnalytics() {
             </div>
 
             {/* Category Performance */}
-            <div className="bg-white rounded-lg shadow p-6">
-              <h2 className="text-lg font-semibold text-gray-900 mb-6">Category Performance</h2>
-              <div className="overflow-x-auto">
-                <table className="min-w-full">
+            <div className="card-section">
+              <h2 className="section-header-mb-6">Category Performance</h2>
+              <div className="table-container">
+                <table className="table">
                   <thead>
-                    <tr className="border-b border-gray-200">
-                      <th className="text-left py-3 px-4 text-sm font-medium text-gray-600">Category</th>
-                      <th className="text-right py-3 px-4 text-sm font-medium text-gray-600">Orders</th>
-                      <th className="text-right py-3 px-4 text-sm font-medium text-gray-600">Revenue</th>
-                      <th className="text-right py-3 px-4 text-sm font-medium text-gray-600">% of Total</th>
+                    <tr className="table-header-row">
+                      <th className="table-header-cell">Category</th>
+                      <th className="table-header-cell-right">Orders</th>
+                      <th className="table-header-cell-right">Revenue</th>
+                      <th className="table-header-cell-right">% of Total</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-gray-200">
+                  <tbody className="table-body">
                     {analytics?.categoryPerformance?.length > 0 ? (
                       analytics.categoryPerformance.map((category, index) => {
                         const percentage = (parseFloat(category.revenue) / totals.revenue) * 100;
                         return (
-                          <tr key={index} className="hover:bg-gray-50">
-                            <td className="py-3 px-4 text-sm font-medium text-gray-900 capitalize">
+                          <tr key={index} className="table-row">
+                            <td className="table-cell-medium capitalize">
                               {category.category}
                             </td>
-                            <td className="py-3 px-4 text-sm text-right text-gray-900">
+                            <td className="table-cell-right">
                               {category.order_count}
                             </td>
-                            <td className="py-3 px-4 text-sm text-right font-semibold text-gray-900">
+                            <td className="table-cell-right-bold">
                               {formatPrice(category.revenue)}
                             </td>
-                            <td className="py-3 px-4 text-sm text-right text-gray-600">
+                            <td className="table-cell-right-muted">
                               {percentage.toFixed(1)}%
                             </td>
                           </tr>
@@ -303,7 +303,7 @@ export default function AdminAnalytics() {
                       })
                     ) : (
                       <tr>
-                        <td colSpan="4" className="py-8 text-center text-gray-500">
+                        <td colSpan="4" className="empty-state">
                           No category data for this period
                         </td>
                       </tr>
@@ -314,66 +314,66 @@ export default function AdminAnalytics() {
             </div>
 
             {/* Top Performing Products */}
-            <div className="bg-white rounded-lg shadow p-6 mt-8">
-              <h2 className="text-lg font-semibold text-gray-900 mb-6">Top Performing Products</h2>
-              <div className="overflow-x-auto">
-                <table className="min-w-full">
+            <div className="card-section-mt">
+              <h2 className="section-header-mb-6">Top Performing Products</h2>
+              <div className="table-container">
+                <table className="table">
                   <thead>
-                    <tr className="border-b border-gray-200">
-                      <th className="text-left py-3 px-4 text-sm font-medium text-gray-600">Rank</th>
-                      <th className="text-left py-3 px-4 text-sm font-medium text-gray-600">Product</th>
-                      <th className="text-left py-3 px-4 text-sm font-medium text-gray-600">Seller</th>
-                      <th className="text-right py-3 px-4 text-sm font-medium text-gray-600">Units Sold</th>
-                      <th className="text-right py-3 px-4 text-sm font-medium text-gray-600">Revenue</th>
+                    <tr className="table-header-row">
+                      <th className="table-header-cell">Rank</th>
+                      <th className="table-header-cell">Product</th>
+                      <th className="table-header-cell">Seller</th>
+                      <th className="table-header-cell-right">Units Sold</th>
+                      <th className="table-header-cell-right">Revenue</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-gray-200">
+                  <tbody className="table-body">
                     {analytics?.topProducts?.length > 0 ? (
                       analytics.topProducts.map((product, index) => (
-                        <tr key={product.id} className="hover:bg-gray-50">
-                          <td className="py-3 px-4 text-sm text-gray-900">
-                            <span className={`inline-flex items-center justify-center w-8 h-8 rounded-full ${
-                              index === 0 ? 'bg-yellow-100 text-yellow-800' :
-                              index === 1 ? 'bg-gray-200 text-gray-700' :
-                              index === 2 ? 'bg-orange-100 text-orange-800' :
-                              'bg-gray-100 text-gray-600'
-                            }`}>
+                        <tr key={product.id} className="table-row">
+                          <td className="table-cell">
+                            <span className={
+                              index === 0 ? 'rank-badge-gold' :
+                              index === 1 ? 'rank-badge-silver' :
+                              index === 2 ? 'rank-badge-bronze' :
+                              'rank-badge'
+                            }>
                               #{index + 1}
                             </span>
                           </td>
-                          <td className="py-3 px-4">
-                            <div className="flex items-center space-x-3">
+                          <td className="table-cell">
+                            <div className="product-cell-flex">
                               {product.image_urls && product.image_urls.length > 0 ? (
                                 <img
                                   src={product.image_urls[0]}
                                   alt={product.name}
-                                  className="w-12 h-12 rounded object-cover"
+                                  className="product-image-sm"
                                 />
                               ) : (
-                                <div className="w-12 h-12 bg-gray-200 rounded flex items-center justify-center">
-                                  <span className="text-gray-400 text-xs">No image</span>
+                                <div className="product-image-placeholder">
+                                  <span className="product-image-placeholder-text">No image</span>
                                 </div>
                               )}
                               <div>
-                                <div className="text-sm font-medium text-gray-900">{product.name}</div>
+                                <div className="table-primary-text">{product.name}</div>
                               </div>
                             </div>
                           </td>
-                          <td className="py-3 px-4">
-                            <div className="text-sm font-medium text-gray-900">{product.shop_name}</div>
-                            <div className="text-sm text-gray-500">/{product.shop_slug}</div>
+                          <td className="table-cell">
+                            <div className="table-primary-text">{product.shop_name}</div>
+                            <div className="table-secondary-text">/{product.shop_slug}</div>
                           </td>
-                          <td className="py-3 px-4 text-sm text-right text-gray-900">
+                          <td className="table-cell-right">
                             {product.units_sold}
                           </td>
-                          <td className="py-3 px-4 text-sm text-right font-semibold text-gray-900">
+                          <td className="table-cell-right-bold">
                             {formatPrice(product.total_revenue)}
                           </td>
                         </tr>
                       ))
                     ) : (
                       <tr>
-                        <td colSpan="5" className="py-8 text-center text-gray-500">
+                        <td colSpan="5" className="empty-state">
                           No product data for this period
                         </td>
                       </tr>

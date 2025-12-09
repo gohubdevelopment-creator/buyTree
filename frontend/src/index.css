@@ -1,3 +1,843 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* ============================================
+   GLOBAL STYLES - BuyTree E-commerce Platform
+   All styling centralized here for easy maintenance
+   ============================================ */
+
+@layer components {
+  /* ==================== LAYOUT ==================== */
+
+  .page-container {
+    @apply min-h-screen bg-gray-50;
+  }
+
+  .content-wrapper {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8;
+  }
+
+  .content-wrapper-no-padding {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+
+  /* ==================== CARDS ==================== */
+
+  .card {
+    @apply bg-white rounded-lg shadow p-6;
+  }
+
+  .card-section {
+    @apply bg-white rounded-lg shadow p-6 mb-8;
+  }
+
+  .card-section-mt {
+    @apply bg-white rounded-lg shadow p-6 mt-8;
+  }
+
+  /* ==================== TYPOGRAPHY ==================== */
+
+  .heading-xl {
+    @apply text-3xl font-bold text-gray-900;
+  }
+
+  .heading-lg {
+    @apply text-2xl font-bold text-gray-900;
+  }
+
+  .heading-md {
+    @apply text-lg font-semibold text-gray-900;
+  }
+
+  .heading-sm {
+    @apply text-md font-semibold text-gray-900;
+  }
+
+  .text-base {
+    @apply text-sm text-gray-900;
+  }
+
+  .text-muted {
+    @apply text-sm text-gray-600;
+  }
+
+  .text-secondary {
+    @apply text-sm text-gray-500;
+  }
+
+  .text-xs-muted {
+    @apply text-xs text-gray-500;
+  }
+
+  .text-xs-secondary {
+    @apply text-xs text-gray-400;
+  }
+
+  .text-medium {
+    @apply text-sm font-medium text-gray-900;
+  }
+
+  .text-semibold {
+    @apply text-sm font-semibold text-gray-900;
+  }
+
+  .text-capitalize {
+    @apply capitalize;
+  }
+
+  .text-truncate {
+    @apply truncate;
+  }
+
+  /* ==================== BUTTONS ==================== */
+
+  .btn {
+    @apply px-4 py-2 rounded-md font-medium transition-colors;
+  }
+
+  .btn-sm {
+    @apply px-3 py-1.5 text-sm rounded-md font-medium transition-colors;
+  }
+
+  .btn-lg {
+    @apply px-8 py-3 rounded-lg font-semibold transition-colors;
+  }
+
+  .btn-primary {
+    @apply btn bg-green-600 text-white hover:bg-green-700;
+  }
+
+  .btn-secondary {
+    @apply btn bg-gray-100 text-gray-700 hover:bg-gray-200;
+  }
+
+  .btn-danger {
+    @apply btn bg-red-600 text-white hover:bg-red-700;
+  }
+
+  .btn-outline-primary {
+    @apply btn border-2 border-green-600 text-green-600 bg-white hover:bg-green-50;
+  }
+
+  /* ==================== NAVIGATION ==================== */
+
+  .nav-header {
+    @apply bg-white border-b border-gray-200;
+  }
+
+  .nav-content {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+
+  .nav-links {
+    @apply flex items-center space-x-4;
+  }
+
+  .nav-flex {
+    @apply flex justify-between items-center;
+  }
+
+  .nav-button-group {
+    @apply flex gap-3;
+  }
+
+  /* ==================== GRIDS ==================== */
+
+  .stats-grid {
+    @apply grid grid-cols-1 md:grid-cols-3 gap-6 mb-8;
+  }
+
+  .status-grid {
+    @apply grid grid-cols-2 md:grid-cols-4 gap-4;
+  }
+
+  .grid-2 {
+    @apply grid grid-cols-1 md:grid-cols-2 gap-4;
+  }
+
+  .grid-3 {
+    @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6;
+  }
+
+  .grid-4 {
+    @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6;
+  }
+
+  .grid-2-lg {
+    @apply grid grid-cols-1 lg:grid-cols-2 gap-8;
+  }
+
+  .grid-2-cols-only {
+    @apply grid grid-cols-2 gap-4;
+  }
+
+  .grid-3-cols-only {
+    @apply grid grid-cols-3 gap-4;
+  }
+
+  .grid-4-cols-only {
+    @apply grid grid-cols-4 gap-4;
+  }
+
+  /* ==================== TABLES ==================== */
+
+  .table-container {
+    @apply overflow-x-auto;
+  }
+
+  .table {
+    @apply min-w-full;
+  }
+
+  .table-divided {
+    @apply min-w-full divide-y divide-gray-200;
+  }
+
+  .table-header-row {
+    @apply border-b border-gray-200;
+  }
+
+  .table-header-row-alt {
+    @apply bg-gray-50;
+  }
+
+  .table-header-cell {
+    @apply text-left py-3 px-4 text-sm font-medium text-gray-600;
+  }
+
+  .table-header-cell-right {
+    @apply text-right py-3 px-4 text-sm font-medium text-gray-600;
+  }
+
+  .table-header-cell-alt {
+    @apply px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider;
+  }
+
+  .table-body {
+    @apply divide-y divide-gray-200;
+  }
+
+  .table-body-alt {
+    @apply bg-white divide-y divide-gray-200;
+  }
+
+  .table-row {
+    @apply hover:bg-gray-50;
+  }
+
+  .table-cell {
+    @apply py-3 px-4 text-sm text-gray-900;
+  }
+
+  .table-cell-right {
+    @apply py-3 px-4 text-sm text-right text-gray-900;
+  }
+
+  .table-cell-right-bold {
+    @apply py-3 px-4 text-sm text-right font-semibold text-gray-900;
+  }
+
+  .table-cell-right-green {
+    @apply py-3 px-4 text-sm text-right font-semibold text-green-600;
+  }
+
+  .table-cell-right-muted {
+    @apply py-3 px-4 text-sm text-right text-gray-600;
+  }
+
+  .table-cell-medium {
+    @apply py-3 px-4 text-sm font-medium text-gray-900;
+  }
+
+  .table-cell-compact {
+    @apply px-6 py-4 whitespace-nowrap text-sm text-gray-900;
+  }
+
+  .table-cell-compact-bold {
+    @apply px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900;
+  }
+
+  .table-cell-compact-muted {
+    @apply px-6 py-4 whitespace-nowrap text-sm text-gray-500;
+  }
+
+  .table-primary-text {
+    @apply text-sm font-medium text-gray-900;
+  }
+
+  .table-secondary-text {
+    @apply text-sm text-gray-500;
+  }
+
+  /* ==================== BADGES & RANKING ==================== */
+
+  .badge {
+    @apply px-2.5 py-0.5 rounded-full text-xs font-medium;
+  }
+
+  .badge-inline {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  }
+
+  .badge-status-pending {
+    @apply badge-inline bg-yellow-100 text-yellow-800;
+  }
+
+  .badge-status-processing {
+    @apply badge-inline bg-blue-100 text-blue-800;
+  }
+
+  .badge-status-shipped {
+    @apply badge-inline bg-purple-100 text-purple-800;
+  }
+
+  .badge-status-delivered {
+    @apply badge-inline bg-green-100 text-green-800;
+  }
+
+  .badge-status-cancelled {
+    @apply badge-inline bg-red-100 text-red-800;
+  }
+
+  .badge-status-default {
+    @apply badge-inline bg-gray-100 text-gray-800;
+  }
+
+  .rank-badge {
+    @apply inline-flex items-center justify-center w-8 h-8 rounded-full;
+  }
+
+  .rank-badge-gold {
+    @apply rank-badge bg-yellow-100 text-yellow-800;
+  }
+
+  .rank-badge-silver {
+    @apply rank-badge bg-gray-200 text-gray-700;
+  }
+
+  .rank-badge-bronze {
+    @apply rank-badge bg-orange-100 text-orange-800;
+  }
+
+  .rank-badge-default {
+    @apply rank-badge bg-gray-100 text-gray-600;
+  }
+
+  /* ==================== IMAGES ==================== */
+
+  .product-image-sm {
+    @apply w-12 h-12 rounded object-cover;
+  }
+
+  .product-image-md {
+    @apply w-16 h-16 rounded object-cover;
+  }
+
+  .product-image-placeholder {
+    @apply w-12 h-12 bg-gray-200 rounded flex items-center justify-center;
+  }
+
+  .product-image-placeholder-text {
+    @apply text-gray-400 text-xs;
+  }
+
+  .product-image-placeholder-md {
+    @apply w-16 h-16 bg-gray-200 rounded flex items-center justify-center;
+  }
+
+  .icon-sm {
+    @apply w-8 h-8;
+  }
+
+  .icon-md {
+    @apply w-10 h-10;
+  }
+
+  .icon-lg {
+    @apply w-8 h-8;
+  }
+
+  /* ==================== STATS & OVERVIEW CARDS ==================== */
+
+  .stat-card {
+    @apply text-center p-4 rounded-lg;
+  }
+
+  .stat-card-indigo {
+    @apply stat-card bg-indigo-50;
+  }
+
+  .stat-card-blue {
+    @apply stat-card bg-blue-50;
+  }
+
+  .stat-card-green {
+    @apply stat-card bg-green-50;
+  }
+
+  .stat-card-yellow {
+    @apply stat-card bg-yellow-50;
+  }
+
+  .stat-card-purple {
+    @apply stat-card bg-purple-50;
+  }
+
+  .stat-card-red {
+    @apply stat-card bg-red-50;
+  }
+
+  .stat-value {
+    @apply text-3xl font-bold text-gray-900;
+  }
+
+  .stat-value-md {
+    @apply text-lg font-bold text-gray-900;
+  }
+
+  .stat-value-lg {
+    @apply text-2xl font-bold text-gray-900;
+  }
+
+  .stat-value-green {
+    @apply text-3xl font-bold text-green-600;
+  }
+
+  .stat-label {
+    @apply text-sm text-gray-600 mb-2;
+  }
+
+  .stat-label-sm {
+    @apply text-xs text-gray-500;
+  }
+
+  .stat-description {
+    @apply text-xs text-gray-500 mt-2;
+  }
+
+  /* Status cards */
+  .status-card-yellow {
+    @apply text-center p-4 bg-yellow-50 rounded-lg;
+  }
+
+  .status-card-blue {
+    @apply text-center p-4 bg-blue-50 rounded-lg;
+  }
+
+  .status-card-purple {
+    @apply text-center p-4 bg-purple-50 rounded-lg;
+  }
+
+  .status-card-green {
+    @apply text-center p-4 bg-green-50 rounded-lg;
+  }
+
+  .status-value {
+    @apply text-3xl font-bold;
+  }
+
+  .status-label {
+    @apply text-sm text-gray-600 mt-1;
+  }
+
+  /* ==================== FORM ELEMENTS ==================== */
+
+  .form-select {
+    @apply px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:outline-none;
+  }
+
+  .form-select-sm {
+    @apply px-3 py-1.5 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-green-500 focus:outline-none;
+  }
+
+  .form-input {
+    @apply px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-green-500 focus:outline-none;
+  }
+
+  .form-input-group {
+    @apply rounded-md shadow-sm -space-y-px;
+  }
+
+  .form-input-top {
+    @apply appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-green-500 focus:border-green-500 focus:z-10 sm:text-sm;
+  }
+
+  .form-input-bottom {
+    @apply appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-green-500 focus:border-green-500 focus:z-10 sm:text-sm;
+  }
+
+  .form-label {
+    @apply block text-sm font-medium text-gray-700 mb-2;
+  }
+
+  /* ==================== LOADING STATES ==================== */
+
+  .loading-spinner {
+    @apply animate-spin rounded-full h-8 w-8 border-b-2 border-green-600 mx-auto;
+  }
+
+  .loading-spinner-sm {
+    @apply animate-spin rounded-full h-4 w-4 border-b-2 border-green-600;
+  }
+
+  .loading-spinner-md {
+    @apply animate-spin rounded-full h-8 w-8 border-b-2 border-green-600 mx-auto;
+  }
+
+  .loading-spinner-lg {
+    @apply animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto;
+  }
+
+  .loading-container {
+    @apply text-center py-12;
+  }
+
+  .loading-text {
+    @apply mt-4 text-gray-600 text-sm;
+  }
+
+  .loading-dot {
+    @apply w-3 h-3 bg-green-600 rounded-full animate-bounce;
+  }
+
+  /* ==================== EMPTY STATES ==================== */
+
+  .empty-state {
+    @apply text-center py-8 text-gray-500;
+  }
+
+  .empty-state-bg {
+    @apply text-center py-12 text-gray-500;
+  }
+
+  .empty-state-text {
+    @apply text-sm;
+  }
+
+  .empty-state-subtitle {
+    @apply text-sm mt-1;
+  }
+
+  .empty-state-icon {
+    @apply mx-auto h-12 w-12 text-gray-400 mb-4;
+  }
+
+  .empty-state-icon-lg {
+    @apply mx-auto h-12 w-12 text-gray-400 mb-4;
+  }
+
+  /* ==================== PRODUCT LIST ITEMS ==================== */
+
+  .product-list-item {
+    @apply flex items-center gap-4 pb-4 border-b last:border-b-0;
+  }
+
+  .product-card-hover {
+    @apply flex items-center gap-4 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors;
+  }
+
+  .product-cell-flex {
+    @apply flex items-center space-x-3;
+  }
+
+  .product-info {
+    @apply flex-1 min-w-0;
+  }
+
+  .product-title {
+    @apply text-sm font-medium text-gray-900 truncate;
+  }
+
+  .product-price {
+    @apply text-sm text-gray-500;
+  }
+
+  .product-stats-primary {
+    @apply text-sm font-semibold text-gray-900;
+  }
+
+  .product-revenue {
+    @apply text-sm text-green-600;
+  }
+
+  .rank-number-container {
+    @apply flex-shrink-0 w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center;
+  }
+
+  .rank-number {
+    @apply text-sm font-bold text-indigo-600;
+  }
+
+  .view-count-primary {
+    @apply text-sm font-semibold text-indigo-600;
+  }
+
+  .view-count-secondary {
+    @apply text-xs text-gray-500;
+  }
+
+  .stock-info {
+    @apply text-xs text-gray-500 mt-1;
+  }
+
+  .badge-stock {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  }
+
+  .badge-stock-low {
+    @apply badge-stock bg-yellow-100 text-yellow-800;
+  }
+
+  .badge-stock-empty {
+    @apply badge-stock bg-red-100 text-red-800;
+  }
+
+  /* ==================== SECTION HEADERS ==================== */
+
+  .section-header {
+    @apply text-lg font-semibold text-gray-900;
+  }
+
+  .section-header-mb-4 {
+    @apply text-lg font-semibold text-gray-900 mb-4;
+  }
+
+  .section-header-mb-6 {
+    @apply text-lg font-semibold text-gray-900 mb-6;
+  }
+
+  .section-title {
+    @apply text-lg font-semibold text-gray-900;
+  }
+
+  .section-subtitle {
+    @apply text-sm text-gray-600 mt-1;
+  }
+
+  /* ==================== FLEX UTILITIES ==================== */
+
+  .flex-center {
+    @apply flex items-center justify-center;
+  }
+
+  .flex-between {
+    @apply flex justify-between items-center;
+  }
+
+  .flex-start {
+    @apply flex items-start;
+  }
+
+  .flex-end {
+    @apply flex items-end;
+  }
+
+  .flex-col-center {
+    @apply flex flex-col items-center;
+  }
+
+  .flex-col-end {
+    @apply flex flex-col items-end;
+  }
+
+  .flex-gap-2 {
+    @apply flex gap-2;
+  }
+
+  .flex-gap-3 {
+    @apply flex gap-3;
+  }
+
+  .flex-gap-4 {
+    @apply flex gap-4;
+  }
+
+  /* Note: space-y-* and space-x-* are already provided by Tailwind, no need to redefine them */
+
+  /* ==================== ICON CONTAINERS ==================== */
+
+  .icon-container {
+    @apply p-3 rounded-full;
+  }
+
+  .icon-container-green {
+    @apply icon-container bg-green-100;
+  }
+
+  .icon-container-blue {
+    @apply icon-container bg-blue-100;
+  }
+
+  .icon-container-purple {
+    @apply icon-container bg-purple-100;
+  }
+
+  .icon-container-yellow {
+    @apply icon-container bg-yellow-100;
+  }
+
+  .icon-green {
+    @apply text-green-600;
+  }
+
+  .icon-blue {
+    @apply text-blue-600;
+  }
+
+  .icon-purple {
+    @apply text-purple-600;
+  }
+
+  .icon-yellow {
+    @apply text-yellow-600;
+  }
+
+  .icon-gray {
+    @apply text-gray-400;
+  }
+
+  /* ==================== DIVIDERS ==================== */
+
+  .divider {
+    @apply border-t border-gray-200;
+  }
+
+  .divider-mt-4 {
+    @apply pt-4 border-t border-gray-200;
+  }
+
+  /* ==================== SPACING ==================== */
+
+  /* Note: All spacing utilities (mb-*, mt-*, p-*, px-*, py-*, etc.) are already provided by Tailwind */
+
+  /* ==================== GRADIENTS & BACKGROUNDS ==================== */
+
+  .gradient-green {
+    @apply bg-gradient-to-br from-green-50 to-white;
+  }
+
+  .bg-page {
+    @apply bg-gray-50;
+  }
+
+  .bg-white-shadow {
+    @apply bg-white shadow;
+  }
+
+  /* ==================== BORDERS & RADIUS ==================== */
+
+  .rounded-default {
+    @apply rounded-lg;
+  }
+
+  .rounded-sm-default {
+    @apply rounded-md;
+  }
+
+  .rounded-full-default {
+    @apply rounded-full;
+  }
+
+  .border-gray {
+    @apply border border-gray-200;
+  }
+
+  .border-bottom {
+    @apply border-b border-gray-200;
+  }
+
+  /* ==================== TEXT COLORS ==================== */
+
+  .text-success {
+    @apply text-green-600;
+  }
+
+  .text-danger {
+    @apply text-red-600;
+  }
+
+  .text-warning {
+    @apply text-yellow-600;
+  }
+
+  .text-info {
+    @apply text-blue-600;
+  }
+
+  .error-text {
+    @apply text-red-600;
+  }
+
+  /* ==================== COMING SOON PAGE ==================== */
+
+  .coming-soon-container {
+    @apply min-h-screen bg-gradient-to-br from-green-50 to-white flex items-center justify-center px-4;
+  }
+
+  .coming-soon-content {
+    @apply max-w-2xl w-full text-center;
+  }
+
+  .coming-soon-title {
+    @apply text-6xl font-bold text-green-600 mb-4;
+  }
+
+  .coming-soon-divider {
+    @apply w-24 h-1 bg-green-600 mx-auto mb-8;
+  }
+
+  .coming-soon-subtitle {
+    @apply text-2xl text-gray-700 mb-6;
+  }
+
+  .coming-soon-text {
+    @apply text-lg text-gray-600 mb-8;
+  }
+
+  .coming-soon-buttons {
+    @apply flex justify-center items-center space-x-4 mb-12;
+  }
+
+  .coming-soon-dots {
+    @apply flex justify-center items-center space-x-4 mt-12;
+  }
+
+  /* ==================== AUTHENTICATION PAGES ==================== */
+
+  .auth-container {
+    @apply min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8;
+  }
+
+  .auth-form-wrapper {
+    @apply max-w-md w-full space-y-8;
+  }
+
+  .auth-title {
+    @apply mt-6 text-center text-3xl font-extrabold text-gray-900;
+  }
+
+  .auth-subtitle {
+    @apply mt-2 text-center text-sm text-gray-600;
+  }
+
+  .auth-form {
+    @apply mt-8 space-y-6;
+  }
+
+  .alert-error {
+    @apply rounded-md bg-red-50 p-4;
+  }
+
+  .alert-text {
+    @apply text-sm text-red-800;
+  }
+
+  .btn-primary-full {
+    @apply relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:bg-gray-400 disabled:cursor-not-allowed;
+  }
+
+  .link-primary {
+    @apply font-medium text-green-600 hover:text-green-500;
+  }
+}

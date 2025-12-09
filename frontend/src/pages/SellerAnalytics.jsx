@@ -89,10 +89,10 @@ export default function SellerAnalytics() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="page-container flex-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading analytics...</p>
+          <div className="loading-spinner-lg"></div>
+          <p className="loading-text">Loading analytics...</p>
         </div>
       </div>
     );
@@ -100,12 +100,12 @@ export default function SellerAnalytics() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="page-container flex-center">
         <div className="text-center">
-          <p className="text-red-600">{error}</p>
+          <p className="error-text">{error}</p>
           <button
             onClick={fetchAnalytics}
-            className="mt-4 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
+            className="btn-primary mt-4"
           >
             Retry
           </button>
@@ -120,31 +120,31 @@ export default function SellerAnalytics() {
   const maxRevenue = Math.max(...(revenue_by_day || []).map((day) => parseFloat(day.revenue)));
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="page-container">
       {/* Header */}
-      <div className="bg-white shadow">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex justify-between items-center">
+      <div className="nav-header">
+        <div className="nav-content">
+          <div className="flex-between">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Analytics Dashboard</h1>
-              <p className="text-sm text-gray-600">Track your sales performance and insights</p>
+              <h1 className="heading-xl">Analytics Dashboard</h1>
+              <p className="text-muted">Track your sales performance and insights</p>
             </div>
-            <div className="flex gap-3">
+            <div className="nav-links">
               <Link
                 to="/seller/dashboard"
-                className="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200"
+                className="btn-secondary"
               >
                 Products
               </Link>
               <Link
                 to="/seller/orders"
-                className="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200"
+                className="btn-secondary"
               >
                 Orders
               </Link>
               <button
                 onClick={logout}
-                className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
+                className="btn-danger"
               >
                 Logout
               </button>
@@ -153,15 +153,15 @@ export default function SellerAnalytics() {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="content-wrapper">
         {/* Overview Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div className="grid-4 mb-8">
           {/* Total Revenue */}
-          <div className="bg-white rounded-lg shadow p-6">
-            <div className="flex items-center justify-between">
+          <div className="stat-card-green">
+            <div className="flex-between">
               <div>
-                <p className="text-sm text-gray-600">Total Revenue</p>
-                <p className="text-2xl font-bold text-gray-900 mt-1">
+                <p className="stat-label">Total Revenue</p>
+                <p className="stat-value-lg">
                   {formatPrice(parseFloat(overview?.total_revenue) || 0)}
                 </p>
                 {overview?.revenue_growth_percentage !== 0 && (
@@ -175,8 +175,8 @@ export default function SellerAnalytics() {
                   </p>
                 )}
               </div>
-              <div className="bg-green-100 p-3 rounded-full">
-                <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="icon-container-green">
+                <svg className="icon-lg" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -189,11 +189,11 @@ export default function SellerAnalytics() {
           </div>
 
           {/* Total Orders */}
-          <div className="bg-white rounded-lg shadow p-6">
-            <div className="flex items-center justify-between">
+          <div className="stat-card-blue">
+            <div className="flex-between">
               <div>
-                <p className="text-sm text-gray-600">Total Orders</p>
-                <p className="text-2xl font-bold text-gray-900 mt-1">{overview?.total_orders || 0}</p>
+                <p className="stat-label">Total Orders</p>
+                <p className="stat-value-lg">{overview?.total_orders || 0}</p>
                 {overview?.order_growth_percentage !== 0 && (
                   <p
                     className={`text-sm mt-1 ${
@@ -205,8 +205,8 @@ export default function SellerAnalytics() {
                   </p>
                 )}
               </div>
-              <div className="bg-blue-100 p-3 rounded-full">
-                <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="icon-container-blue">
+                <svg className="icon-lg" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -219,16 +219,16 @@ export default function SellerAnalytics() {
           </div>
 
           {/* Average Order Value */}
-          <div className="bg-white rounded-lg shadow p-6">
-            <div className="flex items-center justify-between">
+          <div className="stat-card-purple">
+            <div className="flex-between">
               <div>
-                <p className="text-sm text-gray-600">Avg. Order Value</p>
-                <p className="text-2xl font-bold text-gray-900 mt-1">
+                <p className="stat-label">Avg. Order Value</p>
+                <p className="stat-value-lg">
                   {formatPrice(parseFloat(overview?.average_order_value) || 0)}
                 </p>
               </div>
-              <div className="bg-purple-100 p-3 rounded-full">
-                <svg className="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="icon-container-purple">
+                <svg className="icon-lg" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -241,15 +241,15 @@ export default function SellerAnalytics() {
           </div>
 
           {/* Pending Orders */}
-          <div className="bg-white rounded-lg shadow p-6">
-            <div className="flex items-center justify-between">
+          <div className="stat-card-yellow">
+            <div className="flex-between">
               <div>
-                <p className="text-sm text-gray-600">Pending Orders</p>
-                <p className="text-2xl font-bold text-gray-900 mt-1">{overview?.pending_orders || 0}</p>
-                <p className="text-sm text-gray-500 mt-1">Need your attention</p>
+                <p className="stat-label">Pending Orders</p>
+                <p className="stat-value-lg">{overview?.pending_orders || 0}</p>
+                <p className="stat-description">Need your attention</p>
               </div>
-              <div className="bg-yellow-100 p-3 rounded-full">
-                <svg className="w-8 h-8 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="icon-container-yellow">
+                <svg className="icon-lg" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -263,31 +263,31 @@ export default function SellerAnalytics() {
         </div>
 
         {/* Order Status Breakdown */}
-        <div className="bg-white rounded-lg shadow p-6 mb-8">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Order Status Breakdown</h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="text-center p-4 bg-yellow-50 rounded-lg">
-              <p className="text-3xl font-bold text-yellow-600">{overview?.pending_orders || 0}</p>
-              <p className="text-sm text-gray-600 mt-1">Pending</p>
+        <div className="card-section">
+          <h2 className="section-header-mb-4">Order Status Breakdown</h2>
+          <div className="status-grid">
+            <div className="status-card-yellow">
+              <p className="status-value">{overview?.pending_orders || 0}</p>
+              <p className="status-label">Pending</p>
             </div>
-            <div className="text-center p-4 bg-blue-50 rounded-lg">
-              <p className="text-3xl font-bold text-blue-600">{overview?.processing_orders || 0}</p>
-              <p className="text-sm text-gray-600 mt-1">Processing</p>
+            <div className="status-card-blue">
+              <p className="status-value">{overview?.processing_orders || 0}</p>
+              <p className="status-label">Processing</p>
             </div>
-            <div className="text-center p-4 bg-purple-50 rounded-lg">
-              <p className="text-3xl font-bold text-purple-600">{overview?.shipped_orders || 0}</p>
-              <p className="text-sm text-gray-600 mt-1">Shipped</p>
+            <div className="status-card-purple">
+              <p className="status-value">{overview?.shipped_orders || 0}</p>
+              <p className="status-label">Shipped</p>
             </div>
-            <div className="text-center p-4 bg-green-50 rounded-lg">
-              <p className="text-3xl font-bold text-green-600">{overview?.delivered_orders || 0}</p>
-              <p className="text-sm text-gray-600 mt-1">Delivered</p>
+            <div className="status-card-green">
+              <p className="status-value">{overview?.delivered_orders || 0}</p>
+              <p className="status-label">Delivered</p>
             </div>
           </div>
         </div>
 
         {/* Revenue Chart - Last 30 Days */}
-        <div className="bg-white rounded-lg shadow p-6 mb-8">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Revenue (Last 30 Days)</h2>
+        <div className="card-section">
+          <h2 className="section-header-mb-4">Revenue (Last 30 Days)</h2>
           {revenue_by_day && revenue_by_day.length > 0 ? (
             <div className="space-y-4">
               {/* MUI BarChart */}
@@ -328,22 +328,22 @@ export default function SellerAnalytics() {
               </div>
 
               {/* Summary stats below chart */}
-              <div className="grid grid-cols-3 gap-4 pt-4 border-t border-gray-200">
+              <div className="grid-3 pt-4 border-t border-gray-200">
                 <div className="text-center">
-                  <p className="text-xs text-gray-500">Total Revenue</p>
-                  <p className="text-lg font-bold text-gray-900">
+                  <p className="stat-label-sm">Total Revenue</p>
+                  <p className="stat-value-md">
                     {formatPrice(revenue_by_day.reduce((sum, day) => sum + parseFloat(day.revenue || 0), 0))}
                   </p>
                 </div>
                 <div className="text-center">
-                  <p className="text-xs text-gray-500">Total Orders</p>
-                  <p className="text-lg font-bold text-gray-900">
+                  <p className="stat-label-sm">Total Orders</p>
+                  <p className="stat-value-md">
                     {revenue_by_day.reduce((sum, day) => sum + parseInt(day.orders_count || 0), 0)}
                   </p>
                 </div>
                 <div className="text-center">
-                  <p className="text-xs text-gray-500">Daily Average</p>
-                  <p className="text-lg font-bold text-gray-900">
+                  <p className="stat-label-sm">Daily Average</p>
+                  <p className="stat-value-md">
                     {formatPrice(
                       revenue_by_day.reduce((sum, day) => sum + parseFloat(day.revenue || 0), 0) /
                       revenue_by_day.length
@@ -353,24 +353,24 @@ export default function SellerAnalytics() {
               </div>
             </div>
           ) : (
-            <div className="text-center py-12 text-gray-500">
-              <svg className="mx-auto h-12 w-12 text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div className="empty-state-bg">
+              <svg className="empty-state-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
               </svg>
               <p>No revenue data available</p>
-              <p className="text-sm mt-1">Start making sales to see your revenue chart</p>
+              <p className="empty-state-subtitle">Start making sales to see your revenue chart</p>
             </div>
           )}
         </div>
 
         {/* Product Views Analytics */}
-        <div className="bg-white rounded-lg shadow p-6 mb-8">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-lg font-semibold text-gray-900">Product Views</h2>
+        <div className="card-section">
+          <div className="flex-between mb-4">
+            <h2 className="section-header">Product Views</h2>
             <select
               value={viewPeriod}
               onChange={(e) => setViewPeriod(e.target.value)}
-              className="px-3 py-1.5 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-green-500"
+              className="form-select-sm"
             >
               <option value="7">Last 7 Days</option>
               <option value="30">Last 30 Days</option>
@@ -380,42 +380,42 @@ export default function SellerAnalytics() {
 
           {viewsLoading ? (
             <div className="text-center py-12">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600 mx-auto"></div>
-              <p className="mt-4 text-gray-600 text-sm">Loading views...</p>
+              <div className="loading-spinner-md"></div>
+              <p className="loading-text">Loading views...</p>
             </div>
           ) : viewAnalytics ? (
             <div className="space-y-6">
               {/* Views Summary */}
-              <div className="grid grid-cols-2 gap-4">
-                <div className="text-center p-4 bg-indigo-50 rounded-lg">
-                  <p className="text-sm text-gray-600 mb-1">Total Views (All Time)</p>
-                  <p className="text-3xl font-bold text-indigo-600">{viewAnalytics.totalViews?.toLocaleString() || 0}</p>
+              <div className="grid-2">
+                <div className="stat-card-indigo">
+                  <p className="stat-label-sm mb-1">Total Views (All Time)</p>
+                  <p className="stat-value">{viewAnalytics.totalViews?.toLocaleString() || 0}</p>
                 </div>
-                <div className="text-center p-4 bg-blue-50 rounded-lg">
-                  <p className="text-sm text-gray-600 mb-1">Views (Last {viewPeriod} Days)</p>
-                  <p className="text-3xl font-bold text-blue-600">{viewAnalytics.periodViews?.toLocaleString() || 0}</p>
+                <div className="stat-card-blue">
+                  <p className="stat-label-sm mb-1">Views (Last {viewPeriod} Days)</p>
+                  <p className="stat-value">{viewAnalytics.periodViews?.toLocaleString() || 0}</p>
                 </div>
               </div>
 
               {/* Most Viewed Products */}
               <div>
-                <h3 className="text-md font-semibold text-gray-900 mb-3">Most Viewed Products</h3>
+                <h3 className="heading-md mb-3">Most Viewed Products</h3>
                 {viewAnalytics.mostViewedProducts && viewAnalytics.mostViewedProducts.length > 0 ? (
                   <div className="space-y-3">
                     {viewAnalytics.mostViewedProducts.map((product, index) => (
-                      <div key={product.id} className="flex items-center gap-4 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                        <div className="flex-shrink-0 w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center">
-                          <span className="text-sm font-bold text-indigo-600">#{index + 1}</span>
+                      <div key={product.id} className="product-card-hover">
+                        <div className="rank-number-container">
+                          <span className="rank-number">#{index + 1}</span>
                         </div>
                         {product.image_urls && product.image_urls.length > 0 ? (
                           <img
                             src={product.image_urls[0]}
                             alt={product.name}
-                            className="w-16 h-16 object-cover rounded"
+                            className="product-image-md"
                           />
                         ) : (
-                          <div className="w-16 h-16 bg-gray-200 rounded flex items-center justify-center">
-                            <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <div className="product-image-placeholder-md">
+                            <svg className="icon-lg text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path
                                 strokeLinecap="round"
                                 strokeLinejoin="round"
@@ -426,20 +426,20 @@ export default function SellerAnalytics() {
                           </div>
                         )}
                         <div className="flex-1 min-w-0">
-                          <h4 className="text-sm font-medium text-gray-900 truncate">{product.name}</h4>
-                          <p className="text-sm text-gray-500">{formatPrice(parseFloat(product.price))}</p>
+                          <h4 className="product-title">{product.name}</h4>
+                          <p className="product-price">{formatPrice(parseFloat(product.price))}</p>
                         </div>
                         <div className="text-right">
                           <div className="flex flex-col items-end">
-                            <p className="text-sm font-semibold text-indigo-600">
+                            <p className="view-count-primary">
                               {parseInt(product.period_views || 0).toLocaleString()} views
                             </p>
-                            <p className="text-xs text-gray-500">
+                            <p className="view-count-secondary">
                               {parseInt(product.total_views || 0).toLocaleString()} total
                             </p>
                           </div>
                           {product.quantity_available !== undefined && (
-                            <p className="text-xs text-gray-500 mt-1">
+                            <p className="stock-info">
                               {product.quantity_available} in stock
                             </p>
                           )}
@@ -448,40 +448,40 @@ export default function SellerAnalytics() {
                     ))}
                   </div>
                 ) : (
-                  <div className="text-center py-8 text-gray-500 bg-gray-50 rounded-lg">
-                    <svg className="mx-auto h-10 w-10 text-gray-400 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <div className="empty-state-bg">
+                    <svg className="empty-state-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                     </svg>
-                    <p className="text-sm">No product views yet</p>
+                    <p className="empty-state-text">No product views yet</p>
                   </div>
                 )}
               </div>
             </div>
           ) : (
-            <div className="text-center py-8 text-gray-500">
+            <div className="empty-state">
               <p>Unable to load view analytics</p>
             </div>
           )}
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+        <div className="grid-2-lg mb-8">
           {/* Top Selling Products */}
-          <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Top Selling Products</h2>
+          <div className="card">
+            <h2 className="section-header-mb-4">Top Selling Products</h2>
             {top_products && top_products.length > 0 ? (
               <div className="space-y-4">
                 {top_products.slice(0, 5).map((product) => (
-                  <div key={product.id} className="flex items-center gap-4 pb-4 border-b last:border-b-0">
+                  <div key={product.id} className="product-list-item">
                     {product.image_urls && product.image_urls.length > 0 ? (
                       <img
                         src={product.image_urls[0]}
                         alt={product.name}
-                        className="w-16 h-16 object-cover rounded"
+                        className="product-image-md"
                       />
                     ) : (
-                      <div className="w-16 h-16 bg-gray-200 rounded flex items-center justify-center">
-                        <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <div className="product-image-placeholder-md">
+                        <svg className="icon-lg text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path
                             strokeLinecap="round"
                             strokeLinejoin="round"
@@ -492,37 +492,37 @@ export default function SellerAnalytics() {
                       </div>
                     )}
                     <div className="flex-1 min-w-0">
-                      <h3 className="text-sm font-medium text-gray-900 truncate">{product.name}</h3>
-                      <p className="text-sm text-gray-500">{formatPrice(parseFloat(product.price))}</p>
+                      <h3 className="product-title">{product.name}</h3>
+                      <p className="product-price">{formatPrice(parseFloat(product.price))}</p>
                     </div>
                     <div className="text-right">
-                      <p className="text-sm font-semibold text-gray-900">{product.units_sold || 0} sold</p>
-                      <p className="text-sm text-green-600">{formatPrice(parseFloat(product.revenue) || 0)}</p>
+                      <p className="product-stats-primary">{product.units_sold || 0} sold</p>
+                      <p className="product-revenue">{formatPrice(parseFloat(product.revenue) || 0)}</p>
                     </div>
                   </div>
                 ))}
               </div>
             ) : (
-              <div className="text-center py-8 text-gray-500">No sales data yet</div>
+              <div className="empty-state">No sales data yet</div>
             )}
           </div>
 
           {/* Low Stock Alert */}
-          <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Low Stock Alert</h2>
+          <div className="card">
+            <h2 className="section-header-mb-4">Low Stock Alert</h2>
             {low_stock_products && low_stock_products.length > 0 ? (
               <div className="space-y-4">
                 {low_stock_products.map((product) => (
-                  <div key={product.id} className="flex items-center gap-4 pb-4 border-b last:border-b-0">
+                  <div key={product.id} className="product-list-item">
                     {product.image_urls && product.image_urls.length > 0 ? (
                       <img
                         src={product.image_urls[0]}
                         alt={product.name}
-                        className="w-16 h-16 object-cover rounded"
+                        className="product-image-md"
                       />
                     ) : (
-                      <div className="w-16 h-16 bg-gray-200 rounded flex items-center justify-center">
-                        <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <div className="product-image-placeholder-md">
+                        <svg className="icon-lg text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path
                             strokeLinecap="round"
                             strokeLinejoin="round"
@@ -533,15 +533,15 @@ export default function SellerAnalytics() {
                       </div>
                     )}
                     <div className="flex-1 min-w-0">
-                      <h3 className="text-sm font-medium text-gray-900 truncate">{product.name}</h3>
-                      <p className="text-sm text-gray-500">{formatPrice(parseFloat(product.price))}</p>
+                      <h3 className="product-title">{product.name}</h3>
+                      <p className="product-price">{formatPrice(parseFloat(product.price))}</p>
                     </div>
                     <div className="text-right">
                       <span
-                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                        className={`badge-stock ${
                           product.quantity_available === 0
-                            ? 'bg-red-100 text-red-800'
-                            : 'bg-yellow-100 text-yellow-800'
+                            ? 'badge-stock-empty'
+                            : 'badge-stock-low'
                         }`}
                       >
                         {product.quantity_available} left
@@ -551,59 +551,59 @@ export default function SellerAnalytics() {
                 ))}
               </div>
             ) : (
-              <div className="text-center py-8 text-gray-500">All products are well stocked</div>
+              <div className="empty-state">All products are well stocked</div>
             )}
           </div>
         </div>
 
         {/* Recent Orders */}
-        <div className="bg-white rounded-lg shadow p-6">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-lg font-semibold text-gray-900">Recent Orders</h2>
-            <Link to="/seller/orders" className="text-sm text-green-600 hover:text-green-700 font-medium">
+        <div className="card">
+          <div className="flex-between mb-4">
+            <h2 className="section-header">Recent Orders</h2>
+            <Link to="/seller/orders" className="link-primary">
               View All Orders →
             </Link>
           </div>
           {recent_orders && recent_orders.length > 0 ? (
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <div className="table-container">
+              <table className="table">
+                <thead>
+                  <tr className="table-header-row-alt">
+                    <th className="table-header-cell-alt">
                       Order ID
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="table-header-cell-alt">
                       Customer
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="table-header-cell-alt">
                       Amount
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="table-header-cell-alt">
                       Status
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="table-header-cell-alt">
                       Date
                     </th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody className="table-body-alt">
                   {recent_orders.map((order) => (
-                    <tr key={order.id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                    <tr key={order.id} className="table-row">
+                      <td className="table-cell-compact-bold">
                         #{order.order_number}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      <td className="table-cell-compact">
                         {order.first_name} {order.last_name}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      <td className="table-cell-compact">
                         {formatPrice(parseFloat(order.seller_amount))}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusBadgeColor(order.status)}`}>
+                      <td className="table-cell-compact">
+                        <span className={`badge ${getStatusBadgeColor(order.status)}`}>
                           {order.status}
                         </span>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <td className="table-cell-compact-muted">
                         {new Date(order.created_at).toLocaleDateString()}
                       </td>
                     </tr>
@@ -612,7 +612,7 @@ export default function SellerAnalytics() {
               </table>
             </div>
           ) : (
-            <div className="text-center py-8 text-gray-500">No orders yet</div>
+            <div className="empty-state">No orders yet</div>
           )}
         </div>
       </div>

@@ -59,28 +59,28 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
+    <div className="auth-container">
+      <div className="auth-form-wrapper">
         <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+          <h2 className="auth-title">
             Welcome back to BuyTree
           </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
+          <p className="auth-subtitle">
             Or{' '}
-            <Link to="/signup" className="font-medium text-green-600 hover:text-green-500">
+            <Link to="/signup" className="link-primary">
               create a new account
             </Link>
           </p>
         </div>
 
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+        <form className="auth-form" onSubmit={handleSubmit}>
           {error && (
-            <div className="rounded-md bg-red-50 p-4">
-              <div className="text-sm text-red-800">{error}</div>
+            <div className="alert-error">
+              <div className="alert-text">{error}</div>
             </div>
           )}
 
-          <div className="rounded-md shadow-sm -space-y-px">
+          <div className="form-input-group">
             <div>
               <label htmlFor="email" className="sr-only">
                 Email address
@@ -91,7 +91,7 @@ export default function Login() {
                 type="email"
                 autoComplete="email"
                 required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-green-500 focus:border-green-500 focus:z-10 sm:text-sm"
+                className="form-input-top"
                 placeholder="Email address"
                 value={formData.email}
                 onChange={handleChange}
@@ -107,7 +107,7 @@ export default function Login() {
                 type="password"
                 autoComplete="current-password"
                 required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-green-500 focus:border-green-500 focus:z-10 sm:text-sm"
+                className="form-input-bottom"
                 placeholder="Password"
                 value={formData.password}
                 onChange={handleChange}
@@ -115,11 +115,11 @@ export default function Login() {
             </div>
           </div>
 
-          <div className="flex items-center justify-between">
+          <div className="flex-between">
             <div className="text-sm">
               <Link
                 to="/forgot-password"
-                className="font-medium text-green-600 hover:text-green-500"
+                className="link-primary"
               >
                 Forgot your password?
               </Link>
@@ -130,7 +130,7 @@ export default function Login() {
             <button
               type="submit"
               disabled={loading}
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:bg-gray-400 disabled:cursor-not-allowed"
+              className="btn-primary-full"
             >
               {loading ? 'Signing in...' : 'Sign in'}
             </button>
