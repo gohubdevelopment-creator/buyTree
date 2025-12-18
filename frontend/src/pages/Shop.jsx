@@ -4,6 +4,7 @@ import { productService, sellerService } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 import { productCache, shopCache } from '../utils/cache';
+import ShopSEO from '../components/SEO/ShopSEO';
 
 const CATEGORIES = [
   'All',
@@ -21,7 +22,7 @@ export default function Shop() {
   const { shopSlug } = useParams();
   const navigate = useNavigate();
   const { user, logout } = useAuth();
-  const { itemCount } = useCart();
+  const { currentShopItemCount } = useCart();
   const [searchParams, setSearchParams] = useSearchParams();
 
   const [shop, setShop] = useState(null);
@@ -188,20 +189,27 @@ export default function Shop() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header - Store-centric navigation */}
+    <>
+      <ShopSEO shop={shop} />
+      <div className="min-h-screen bg-gray-50">
+        {/* Header - Shop-centric navigation */}
       <nav className="bg-white shadow">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
+            {/* Shop Logo/Name as PRIMARY branding */}
             <div className="flex items-center gap-4">
-              {/* BuyTree Logo - No navigation, just branding */}
-              <div className="text-2xl font-bold text-green-600">
-                BuyTree
-              </div>
-              {/* Powered by badge for sellers to see */}
-              <span className="hidden md:inline text-xs text-gray-500 px-2 py-1 bg-gray-100 rounded-full">
-                Powered Store
-              </span>
+              {shop.shop_logo_url ? (
+                <img
+                  src={shop.shop_logo_url}
+                  alt={shop.shop_name}
+                  className="h-10 w-10 rounded-full object-cover"
+                />
+              ) : (
+                <div className="h-10 w-10 rounded-full bg-green-500 text-white flex items-center justify-center font-bold">
+                  {shop.shop_name[0]}
+                </div>
+              )}
+              <h1 className="text-xl font-bold text-gray-900">{shop.shop_name}</h1>
             </div>
             <div className="flex items-center space-x-2 sm:space-x-4">
               {/* Cart Icon - Visible for all users (guests and authenticated) */}
@@ -213,9 +221,9 @@ export default function Shop() {
                 <svg className="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
                 </svg>
-                {itemCount > 0 && (
+                {currentShopItemCount > 0 && (
                   <span className="absolute -top-1 -right-1 bg-green-600 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
-                    {itemCount > 99 ? '99+' : itemCount}
+                    {currentShopItemCount > 99 ? '99+' : currentShopItemCount}
                   </span>
                 )}
               </button>
@@ -249,13 +257,13 @@ export default function Shop() {
               ) : (
                 <>
                   <button
-                    onClick={() => navigate('/login')}
+                    onClick={() => navigate(`/login?shopSlug=${shopSlug}`)}
                     className="px-3 py-2 sm:px-4 text-gray-700 hover:bg-gray-100 rounded-lg text-sm sm:text-base"
                   >
                     Login
                   </button>
                   <button
-                    onClick={() => navigate('/signup')}
+                    onClick={() => navigate(`/signup?shopSlug=${shopSlug}`)}
                     className="px-3 py-2 sm:px-4 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm sm:text-base"
                   >
                     Sign Up
@@ -264,6 +272,12 @@ export default function Shop() {
               )}
             </div>
           </div>
+        </div>
+        {/* Powered by BuyTree badge */}
+        <div className="border-t border-gray-200 py-2 text-center">
+          <span className="text-xs text-gray-500">
+            Powered by <span className="font-semibold text-green-600">BuyTree</span>
+          </span>
         </div>
       </nav>
 
@@ -573,6 +587,7 @@ export default function Shop() {
           </div>
         </div>
       )}
-    </div>
+      </div>
+    </>
   );
 }

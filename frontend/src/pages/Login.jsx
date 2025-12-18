@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { sellerService } from '../services/api';
 
 export default function Login() {
   const navigate = useNavigate();
@@ -13,6 +14,19 @@ export default function Login() {
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
+  // Shop branding state
+  const shopSlug = searchParams.get('shopSlug');
+  const [shop, setShop] = useState(null);
+
+  // Fetch shop data if shopSlug is present
+  useEffect(() => {
+    if (shopSlug) {
+      sellerService.getSellerBySlug(shopSlug)
+        .then(res => setShop(res.data.seller))
+        .catch(err => console.error('Error fetching shop:', err));
+    }
+  }, [shopSlug]);
 
   const handleChange = (e) => {
     setFormData({
@@ -37,7 +51,10 @@ export default function Login() {
       setTimeout(() => {
         const user = JSON.parse(localStorage.getItem('user') || '{}');
 
-        if (redirectParam) {
+        if (shopSlug) {
+          // If logged in from shop, redirect to shop homepage
+          navigate(`/shop/${shopSlug}`);
+        } else if (redirectParam) {
           // Use redirect parameter if provided
           navigate(redirectParam);
         } else if (user.role === 'admin') {
@@ -62,15 +79,43 @@ export default function Login() {
     <div className="auth-container">
       <div className="auth-form-wrapper">
         <div>
-          <h2 className="auth-title">
-            Welcome back to BuyTree
-          </h2>
-          <p className="auth-subtitle">
-            Or{' '}
-            <Link to="/signup" className="link-primary">
-              create a new account
-            </Link>
-          </p>
+          {shop ? (
+            // Shop-branded login
+            <div className="text-center mb-6">
+              {shop.shop_logo_url && (
+                <img
+                  src={shop.shop_logo_url}
+                  alt={shop.shop_name}
+                  className="h-16 w-16 mx-auto mb-3 rounded-full object-cover"
+                />
+              )}
+              <h2 className="text-3xl font-extrabold text-gray-900 mb-2">
+                Sign in to {shop.shop_name}
+              </h2>
+              <p className="text-sm text-gray-500 mb-4">
+                Powered by <span className="font-semibold text-green-600">BuyTree</span>
+              </p>
+              <p className="auth-subtitle">
+                Or{' '}
+                <Link to={`/signup?shopSlug=${shopSlug}`} className="link-primary">
+                  create a new account
+                </Link>
+              </p>
+            </div>
+          ) : (
+            // Default BuyTree login
+            <>
+              <h2 className="auth-title">
+                Welcome back to BuyTree
+              </h2>
+              <p className="auth-subtitle">
+                Or{' '}
+                <Link to="/signup" className="link-primary">
+                  create a new account
+                </Link>
+              </p>
+            </>
+          )}
         </div>
 
         <form className="auth-form" onSubmit={handleSubmit}>

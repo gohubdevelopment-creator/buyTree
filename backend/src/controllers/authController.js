@@ -12,7 +12,7 @@ const generateToken = (userId) => {
 // Signup
 const signup = async (req, res) => {
   try {
-    const { email, password, firstName, lastName, phone } = req.body;
+    const { email, password, firstName, lastName, phone, registeredViaShopSlug } = req.body;
 
     // Validation
     if (!email || !password) {
@@ -56,12 +56,24 @@ const signup = async (req, res) => {
     const saltRounds = 10;
     const passwordHash = await bcrypt.hash(password, saltRounds);
 
-    // Insert user
+    // Lookup seller_id from shop_slug if provided
+    let registeredViaShopId = null;
+    if (registeredViaShopSlug) {
+      const sellerResult = await db.query(
+        'SELECT id FROM sellers WHERE shop_slug = $1',
+        [registeredViaShopSlug]
+      );
+      if (sellerResult.rows.length > 0) {
+        registeredViaShopId = sellerResult.rows[0].id;
+      }
+    }
+
+    // Insert user with shop tracking
     const result = await db.query(
-      `INSERT INTO users (email, password_hash, first_name, last_name, phone)
-       VALUES ($1, $2, $3, $4, $5)
+      `INSERT INTO users (email, password_hash, first_name, last_name, phone, registered_via_shop_id)
+       VALUES ($1, $2, $3, $4, $5, $6)
        RETURNING id, email, first_name, last_name, phone, role, created_at`,
-      [email.toLowerCase(), passwordHash, firstName, lastName, phone]
+      [email.toLowerCase(), passwordHash, firstName, lastName, phone, registeredViaShopId]
     );
 
     const user = result.rows[0];

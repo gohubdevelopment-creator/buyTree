@@ -1,21 +1,25 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useShopContext } from '../context/ShopContext';
 import { orderService } from '../services/api';
 
 export default function Orders() {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { currentShop } = useShopContext();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchOrders();
-  }, []);
+    if (currentShop) {
+      fetchOrders();
+    }
+  }, [currentShop]);
 
   const fetchOrders = async () => {
     try {
-      const response = await orderService.getUserOrders();
+      const response = await orderService.getUserOrdersByShop(currentShop.shop_slug);
       setOrders(response.data);
     } catch (error) {
       console.error('Failed to fetch orders:', error);
@@ -50,6 +54,31 @@ export default function Orders() {
     return colors[status] || 'bg-gray-100 text-gray-800';
   };
 
+  // Require shop context
+  if (!currentShop) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center max-w-md mx-auto px-4">
+          <svg className="mx-auto h-24 w-24 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+          </svg>
+          <h2 className="mt-6 text-2xl font-bold text-gray-900">
+            Please visit a shop first
+          </h2>
+          <p className="mt-2 text-gray-600">
+            You need to be browsing a shop to view your orders from that shop.
+          </p>
+          <button
+            onClick={() => navigate('/')}
+            className="mt-6 px-6 py-3 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition-colors"
+          >
+            Go Home
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -76,7 +105,7 @@ export default function Orders() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                 </svg>
               </button>
-              <h1 className="text-xl sm:text-2xl font-bold text-gray-900">My Orders</h1>
+              <h1 className="text-xl sm:text-2xl font-bold text-gray-900">My Orders from {currentShop?.shop_name}</h1>
             </div>
             <div className="flex items-center space-x-2 sm:space-x-4">
               {user && (
@@ -94,13 +123,13 @@ export default function Orders() {
             <svg className="mx-auto h-24 w-24 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
-            <h3 className="mt-4 text-xl font-semibold text-gray-900">No orders yet</h3>
+            <h3 className="mt-4 text-xl font-semibold text-gray-900">No orders yet from {currentShop?.shop_name}</h3>
             <p className="mt-2 text-gray-600">Start shopping to see your orders here!</p>
             <button
-              onClick={() => navigate(-1)}
+              onClick={() => navigate(`/shop/${currentShop?.shop_slug}`)}
               className="mt-6 px-6 py-3 bg-green-600 text-white rounded-xl font-semibold hover:bg-green-700 transition-colors"
             >
-              Go Back
+              Continue Shopping
             </button>
           </div>
         ) : (

@@ -2,12 +2,14 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
+import { useShopContext } from '../context/ShopContext';
 import { orderService } from '../services/api';
 
 export default function Checkout() {
   const navigate = useNavigate();
   const location = useLocation();
   const { user } = useAuth();
+  const { currentShop } = useShopContext();
   const { cartItems, getCartTotal, clearCart, syncPendingUpdates } = useCart();
   const [loading, setLoading] = useState(false);
 
@@ -48,6 +50,18 @@ export default function Checkout() {
   }, [syncPendingUpdates]);
 
   useEffect(() => {
+    // Require shop context for checkout
+    if (!currentShop) {
+      // Try to get shop from cart items
+      if (cartItems.length > 0 && cartItems[0].shop_slug) {
+        navigate(`/shop/${cartItems[0].shop_slug}`);
+        return;
+      }
+      // No shop context and can't determine shop - go to cart
+      navigate('/cart');
+      return;
+    }
+
     // Redirect if cart is empty
     if (cartItems.length === 0 || checkoutItems.length === 0) {
       navigate('/cart');
@@ -60,7 +74,7 @@ export default function Checkout() {
       alert('Minimum order value is ₦4,000');
       navigate('/cart');
     }
-  }, [cartItems, checkoutItems, navigate]);
+  }, [cartItems, checkoutItems, currentShop, navigate]);
 
   const formatPrice = (price) => {
     return new Intl.NumberFormat('en-NG', {

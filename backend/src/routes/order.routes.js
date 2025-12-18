@@ -4,6 +4,7 @@ const {
   createOrder,
   verifyPayment,
   getUserOrders,
+  getUserOrdersByShop,
   getOrderDetails,
   getSellerOrders,
   updateOrderStatus,
@@ -23,6 +24,7 @@ router.use(authenticateToken);
 router.post('/create', createOrder);
 router.get('/verify/:reference', verifyPayment);
 router.get('/user', getUserOrders);
+router.get('/user/shop/:shopSlug', getUserOrdersByShop);
 router.post('/:orderId/confirm-delivery', confirmDelivery);
 
 // Order details and history (both buyer and seller can access)

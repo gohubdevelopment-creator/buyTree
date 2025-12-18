@@ -198,6 +198,11 @@ export const orderService = {
     return response.data;
   },
 
+  getUserOrdersByShop: async (shopSlug) => {
+    const response = await api.get(`/orders/user/shop/${shopSlug}`);
+    return response.data;
+  },
+
   confirmDelivery: async (orderId, feedbackData = {}) => {
     const response = await api.post(`/orders/${orderId}/confirm-delivery`, feedbackData);
     return response.data;

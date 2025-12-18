@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { sellerService } from '../services/api';
 
 export default function Signup() {
   const navigate = useNavigate();
@@ -17,6 +18,19 @@ export default function Signup() {
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
+  // Shop branding state
+  const shopSlug = searchParams.get('shopSlug');
+  const [shop, setShop] = useState(null);
+
+  // Fetch shop data if shopSlug is present
+  useEffect(() => {
+    if (shopSlug) {
+      sellerService.getSellerBySlug(shopSlug)
+        .then(res => setShop(res.data.seller))
+        .catch(err => console.error('Error fetching shop:', err));
+    }
+  }, [shopSlug]);
 
   const handleChange = (e) => {
     setFormData({
@@ -56,7 +70,13 @@ export default function Signup() {
     setLoading(true);
 
     const { confirmPassword, ...signupData } = formData;
-    const result = await signup(signupData);
+
+    // Add shop slug to signup data if present
+    const finalSignupData = shopSlug
+      ? { ...signupData, registeredViaShopSlug: shopSlug }
+      : signupData;
+
+    const result = await signup(finalSignupData);
 
     if (result.success) {
       // Get redirect parameter or determine default based on user role
@@ -66,7 +86,10 @@ export default function Signup() {
       setTimeout(() => {
         const user = JSON.parse(localStorage.getItem('user') || '{}');
 
-        if (redirectParam) {
+        if (shopSlug) {
+          // If signed up from shop, redirect to shop homepage
+          navigate(`/shop/${shopSlug}`);
+        } else if (redirectParam) {
           // Use redirect parameter if provided
           navigate(redirectParam);
         } else if (user.role === 'seller') {
@@ -88,15 +111,46 @@ export default function Signup() {
     <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Create your BuyTree account
-          </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
-            Already have an account?{' '}
-            <Link to="/login" className="font-medium text-green-600 hover:text-green-500">
-              Sign in
-            </Link>
-          </p>
+          {shop ? (
+            // Shop-branded signup
+            <div className="text-center">
+              {shop.shop_logo_url && (
+                <img
+                  src={shop.shop_logo_url}
+                  alt={shop.shop_name}
+                  className="h-16 w-16 mx-auto mb-3 rounded-full object-cover"
+                />
+              )}
+              <h2 className="mt-6 text-3xl font-extrabold text-gray-900">
+                Create account for {shop.shop_name}
+              </h2>
+              <p className="mt-2 text-sm text-gray-500">
+                Join {shop.shop_name} customers
+              </p>
+              <p className="mt-1 text-xs text-gray-400">
+                Powered by <span className="font-semibold text-green-600">BuyTree</span>
+              </p>
+              <p className="mt-3 text-sm text-gray-600">
+                Already have an account?{' '}
+                <Link to={`/login?shopSlug=${shopSlug}`} className="font-medium text-green-600 hover:text-green-500">
+                  Sign in
+                </Link>
+              </p>
+            </div>
+          ) : (
+            // Default BuyTree signup
+            <>
+              <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+                Create your BuyTree account
+              </h2>
+              <p className="mt-2 text-center text-sm text-gray-600">
+                Already have an account?{' '}
+                <Link to="/login" className="font-medium text-green-600 hover:text-green-500">
+                  Sign in
+                </Link>
+              </p>
+            </>
+          )}
         </div>
 
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>

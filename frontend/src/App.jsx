@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { ShopContextProvider } from './context/ShopContext';
 import { CartProvider } from './context/CartContext';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import Landing from './pages/Landing';
@@ -53,8 +54,9 @@ function App() {
   return (
     <Router>
       <AuthProvider>
-        <CartProvider>
-        <Routes>
+        <ShopContextProvider>
+          <CartProvider>
+            <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
@@ -194,8 +196,9 @@ function App() {
             }
           />
           <Route path="*" element={<SmartFallback />} />
-        </Routes>
-        </CartProvider>
+            </Routes>
+          </CartProvider>
+        </ShopContextProvider>
       </AuthProvider>
     </Router>
   );

@@ -113,6 +113,35 @@ const addToCart = async (req, res) => {
       cartId = cartResult.rows[0].id;
     }
 
+    // SHOP ISOLATION: Check existing cart items for shop consistency
+    const existingItems = await db.query(
+      `SELECT ci.*, p.seller_id
+       FROM cart_items ci
+       JOIN products p ON ci.product_id = p.id
+       WHERE ci.cart_id = $1`,
+      [cartId]
+    );
+
+    if (existingItems.rows.length > 0) {
+      const existingShopId = existingItems.rows[0].seller_id;
+
+      // Check new product's shop
+      const newProductShop = await db.query(
+        'SELECT seller_id FROM products WHERE id = $1',
+        [productId]
+      );
+
+      const newShopId = newProductShop.rows[0].seller_id;
+
+      if (existingShopId !== newShopId) {
+        return res.status(400).json({
+          success: false,
+          message: 'Cart can only contain items from one shop. Please clear your cart first.',
+          code: 'MULTI_SHOP_CART_ERROR'
+        });
+      }
+    }
+
     // Check if item already in cart
     const existingItem = await db.query(
       'SELECT id, quantity FROM cart_items WHERE cart_id = $1 AND product_id = $2',

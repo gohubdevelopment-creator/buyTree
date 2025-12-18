@@ -370,6 +370,55 @@ const getUserOrders = async (req, res) => {
   }
 };
 
+// Get user's orders filtered by shop
+const getUserOrdersByShop = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { shopSlug } = req.params;
+
+    // Validate shop exists
+    const shopResult = await db.query(
+      'SELECT id FROM sellers WHERE shop_slug = $1',
+      [shopSlug]
+    );
+
+    if (shopResult.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'Shop not found',
+      });
+    }
+
+    const shopId = shopResult.rows[0].id;
+
+    // Get orders for this shop only
+    const result = await db.query(
+      `SELECT
+        o.id, o.order_number, o.total_amount, o.status, o.payment_status,
+        o.delivery_name, o.delivery_phone, o.delivery_address,
+        o.estimated_delivery_date, o.created_at,
+        s.shop_name, s.shop_slug
+      FROM orders o
+      JOIN sellers s ON o.seller_id = s.id
+      WHERE o.buyer_id = $1 AND o.seller_id = $2
+      ORDER BY o.created_at DESC`,
+      [userId, shopId]
+    );
+
+    res.json({
+      success: true,
+      data: result.rows,
+    });
+  } catch (error) {
+    console.error('Get user orders by shop error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch orders',
+      error: error.message,
+    });
+  }
+};
+
 // Get single order details
 const getOrderDetails = async (req, res) => {
   try {
@@ -985,6 +1034,7 @@ module.exports = {
   createOrder,
   verifyPayment,
   getUserOrders,
+  getUserOrdersByShop,
   getOrderDetails,
   getSellerOrders,
   updateOrderStatus,

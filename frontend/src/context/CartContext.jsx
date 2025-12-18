@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { cartService } from '../services/api';
+import { useShopContext } from './ShopContext';
 
 const CartContext = createContext();
 
@@ -12,6 +13,7 @@ export function useCart() {
 }
 
 export function CartProvider({ children }) {
+  const { currentShop } = useShopContext();
   const [cart, setCart] = useState(null);
   const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -55,12 +57,37 @@ export function CartProvider({ children }) {
     if (guestCart.length === 0) return;
 
     try {
-      // Add all guest cart items to user cart
-      for (const item of guestCart) {
+      // Check if multi-shop guest cart
+      const shopIds = [...new Set(guestCart.map(item => item.seller_id).filter(Boolean))];
+
+      let itemsToTransfer = guestCart;
+
+      if (shopIds.length > 1) {
+        // Multiple shops in guest cart - prioritize current shop or first shop
+        const currentShopId = currentShop?.id;
+
+        if (currentShopId && shopIds.includes(currentShopId)) {
+          // Transfer only current shop items
+          itemsToTransfer = guestCart.filter(item => item.seller_id === currentShopId);
+
+          console.log(`Transferring ${itemsToTransfer.length} items from ${currentShop.shop_name} (${guestCart.length - itemsToTransfer.length} items from other shops were discarded)`);
+        } else {
+          // No current shop context - take items from first shop only
+          const firstShopId = shopIds[0];
+          itemsToTransfer = guestCart.filter(item => item.seller_id === firstShopId);
+
+          console.log(`Transferring ${itemsToTransfer.length} items from first shop (${guestCart.length - itemsToTransfer.length} items from other shops were discarded)`);
+        }
+      }
+
+      // Add selected items to user cart
+      for (const item of itemsToTransfer) {
         await cartService.addToCart(item.product_id, item.quantity);
       }
+
       // Clear guest cart
       localStorage.removeItem(GUEST_CART_KEY);
+
       // Refresh user cart
       await fetchCart();
     } catch (error) {
@@ -256,6 +283,26 @@ export function CartProvider({ children }) {
 
   const addToCart = async (productId, quantity = 1, productData = null) => {
     try {
+      // Check for multi-shop cart (shop isolation enforcement)
+      if (cartItems.length > 0) {
+        const currentCartShopId = cartItems[0].seller_id;
+        const newItemShopId = productData?.seller_id;
+
+        if (currentCartShopId && newItemShopId && currentCartShopId !== newItemShopId) {
+          const currentCartShopName = cartItems[0].shop_name || 'another shop';
+          const confirmed = window.confirm(
+            `Your cart contains items from ${currentCartShopName}. Adding this item will clear your current cart. Continue?`
+          );
+
+          if (!confirmed) {
+            return { success: false, message: 'Cart not modified' };
+          }
+
+          // Clear cart before adding from different shop
+          await clearCart();
+        }
+      }
+
       if (isGuest) {
         // Guest cart - add to localStorage
         const currentCart = loadGuestCart();
@@ -432,11 +479,18 @@ export function CartProvider({ children }) {
     await fetchCart(); // Refresh to ensure everything is in sync
   };
 
+  // Get cart item count for current shop only
+  const getCurrentShopItemCount = () => {
+    if (!currentShop) return cartItems.length;
+    return cartItems.filter(item => item.seller_id === currentShop.id).length;
+  };
+
   const value = {
     cart,
     cartItems,
     loading,
     itemCount,
+    currentShopItemCount: getCurrentShopItemCount(),
     isGuest,
     addToCart,
     updateQuantity,

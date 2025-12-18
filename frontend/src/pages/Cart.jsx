@@ -1,11 +1,30 @@
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
+import { useShopContext } from '../context/ShopContext';
+import { useEffect } from 'react';
 
 export default function Cart() {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
+  const { currentShop, setCurrentShop } = useShopContext();
   const { cartItems, loading, updateQuantity, removeFromCart, getCartTotal } = useCart();
+
+  // Auto-set shop context from cart items if missing
+  useEffect(() => {
+    if (!currentShop && cartItems.length > 0) {
+      const firstItem = cartItems[0];
+      if (firstItem.shop_slug) {
+        // Restore shop context from cart
+        const shopData = {
+          id: firstItem.seller_id,
+          shop_slug: firstItem.shop_slug,
+          shop_name: firstItem.shop_name,
+        };
+        setCurrentShop(shopData);
+      }
+    }
+  }, [cartItems, currentShop, setCurrentShop]);
 
   const formatPrice = (price) => {
     return new Intl.NumberFormat('en-NG', {

@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 import ReviewList from '../components/reviews/ReviewList';
 import ReviewForm from '../components/reviews/ReviewForm';
+import ShopSEO from '../components/SEO/ShopSEO';
 
 export default function ProductDetail() {
   const { shopSlug, productSlug } = useParams();
@@ -194,8 +195,10 @@ export default function ProductDetail() {
   const images = product.image_urls && product.image_urls.length > 0 ? product.image_urls : [];
 
   return (
-    <div className="min-h-screen bg-black bg-opacity-50 pb-20 sm:pb-0" onClick={() => navigate(`/shop/${shopSlug}`)}>
-      {/* Header */}
+    <>
+      <ShopSEO shop={shop} product={product} />
+      <div className="min-h-screen bg-black bg-opacity-50 pb-20 sm:pb-0" onClick={() => navigate(`/shop/${shopSlug}`)}>
+        {/* Header */}
       <nav className="bg-white shadow sticky top-0 z-40" onClick={(e) => e.stopPropagation()}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
@@ -588,6 +591,7 @@ export default function ProductDetail() {
           </div>
         </div>
       )}
-    </div>
+      </div>
+    </>
   );
 }
